@@ -1,0 +1,1738 @@
+<title>Crossweave Bible</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#F4F2ED; --sheet:#FFFEFB; --raise:#FBF9F4;
+  --ink:#1C1B19; --ink-2:#4A4740; --muted:#7A766C;
+  --rule:#DDD9CE; --rule-2:#E9E6DD;
+  --rubric:#A32520; --rubric-soft:rgba(163,37,32,.10); --rubric-mid:rgba(163,37,32,.22);
+  --sel:#F2E9D8; --accent-2:#2E4A5C; --accent-soft:rgba(46,74,92,.10);
+  --arc-in:#42587A; --arc-x:#A32520; --bar:#AFA795; --bar-nt:#6C8592;
+  --sea:#E4E7E6; --land:#F2EFE7; --coast:#B9B3A4;
+  --sh-1:0 1px 2px rgba(28,27,25,.05);
+  --sh-2:0 4px 16px rgba(28,27,25,.09);
+  --sh-3:0 16px 48px rgba(28,27,25,.20);
+  --f-scr:"EB Garamond",Georgia,"Times New Roman",serif;
+  --f-ui:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --rd:3px;
+  --fs:18.5px; --lw:34em;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --paper:#121210; --sheet:#1A1A17; --raise:#201F1C;
+  --ink:#E9E5DA; --ink-2:#BDB8AB; --muted:#8B857A;
+  --rule:#2E2D29; --rule-2:#26251F;
+  --rubric:#E07A6E; --rubric-soft:rgba(224,122,110,.12); --rubric-mid:rgba(224,122,110,.28);
+  --sel:#2A2721; --accent-2:#8FB4C8; --accent-soft:rgba(143,180,200,.12);
+  --arc-in:#8EA6CC; --arc-x:#E07A6E; --bar:#4A4840; --bar-nt:#5C7079;
+  --sea:#15181A; --land:#23231F; --coast:#3C3A33;
+  --sh-1:0 1px 2px rgba(0,0,0,.4); --sh-2:0 4px 16px rgba(0,0,0,.45); --sh-3:0 16px 48px rgba(0,0,0,.6);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --paper:#121210; --sheet:#1A1A17; --raise:#201F1C;
+  --ink:#E9E5DA; --ink-2:#BDB8AB; --muted:#8B857A;
+  --rule:#2E2D29; --rule-2:#26251F;
+  --rubric:#E07A6E; --rubric-soft:rgba(224,122,110,.12); --rubric-mid:rgba(224,122,110,.28);
+  --sel:#2A2721; --accent-2:#8FB4C8; --accent-soft:rgba(143,180,200,.12);
+  --arc-in:#8EA6CC; --arc-x:#E07A6E; --bar:#4A4840; --bar-nt:#5C7079;
+  --sea:#15181A; --land:#23231F; --coast:#3C3A33;
+  --sh-1:0 1px 2px rgba(0,0,0,.4); --sh-2:0 4px 16px rgba(0,0,0,.45); --sh-3:0 16px 48px rgba(0,0,0,.6);
+}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-ui);font-size:14px;
+  -webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+button,input,select{font:inherit;color:inherit}
+button{background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--rubric);outline-offset:2px;border-radius:2px}
+::selection{background:var(--sel);color:var(--ink)}
+
+.app{height:100%;display:flex;flex-direction:column;min-height:0}
+
+/* ============ masthead ============ */
+.top{flex:0 0 auto;background:var(--sheet);border-bottom:1px solid var(--rule);position:relative;z-index:20}
+.topin{display:flex;align-items:center;gap:10px;padding:0 14px;height:52px}
+.mark{display:flex;align-items:center;gap:9px;flex:0 0 auto;padding:4px 2px}
+.mark svg{display:block;width:21px;height:21px;flex:0 0 auto}
+.wordmark{font-family:var(--f-scr);font-size:20px;font-weight:600;letter-spacing:.005em;white-space:nowrap;line-height:1}
+.wordmark em{font-style:normal;color:var(--rubric)}
+.nav{display:flex;gap:1px;margin-left:10px}
+.nav button{padding:7px 12px;font-size:12.5px;color:var(--muted);border-radius:var(--rd);letter-spacing:.01em;
+  transition:color .12s,background .12s;white-space:nowrap}
+.nav button:hover{color:var(--ink-2);background:var(--rule-2)}
+.nav button[aria-current="page"]{color:var(--rubric);background:var(--rubric-soft);font-weight:500}
+.spacer{flex:1 1 auto}
+.sbtn{display:flex;align-items:center;gap:8px;border:1px solid var(--rule);border-radius:var(--rd);
+  padding:6px 9px;color:var(--muted);font-size:12.5px;min-width:190px;background:var(--raise);transition:border-color .12s}
+.sbtn:hover{border-color:var(--rubric-mid);color:var(--ink-2)}
+.sbtn kbd{margin-left:auto;font-family:var(--f-ui);font-size:10px;border:1px solid var(--rule);border-radius:2px;
+  padding:1px 4px;color:var(--muted);background:var(--sheet)}
+.ibtn{width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;border-radius:var(--rd);
+  color:var(--muted);transition:color .12s,background .12s;flex:0 0 auto}
+.ibtn:hover{color:var(--ink-2);background:var(--rule-2)}
+.ibtn[aria-pressed="true"]{color:var(--rubric);background:var(--rubric-soft)}
+.ibtn svg{width:16px;height:16px;display:block}
+.tpill{border:1px solid var(--rule);border-radius:var(--rd);padding:5px 9px;font-size:11.5px;font-weight:600;
+  color:var(--accent-2);letter-spacing:.02em;flex:0 0 auto;background:var(--raise)}
+.tpill:hover{border-color:var(--rubric-mid);color:var(--rubric)}
+
+/* ============ trail ============ */
+.trail{display:flex;align-items:center;padding:0 16px 8px;overflow-x:auto;scrollbar-width:thin}
+.trail:empty{display:none}
+.tlab{font-size:10px;text-transform:uppercase;letter-spacing:.11em;color:var(--muted);margin-right:10px;white-space:nowrap}
+.chip{font-family:var(--f-scr);font-size:14.5px;color:var(--ink-2);padding:2px 7px;border-radius:2px;white-space:nowrap}
+.chip:hover{background:var(--rubric-soft);color:var(--rubric)}
+.chip.now{color:var(--rubric);background:var(--rubric-soft);font-weight:600}
+.arw{color:var(--rule);font-size:11px;padding:0 1px;user-select:none}
+
+/* ============ view host ============ */
+.views{flex:1 1 auto;min-height:0;display:flex}
+.view{flex:1 1 auto;min-height:0;min-width:0;display:flex;flex-direction:column}
+
+/* ============ home ============ */
+.home{overflow-y:auto}
+.hm{max-width:1060px;margin:0 auto;padding:40px 16px 90px;width:100%}
+.hero{max-width:40ch}
+.hero h1{font-family:var(--f-scr);font-size:clamp(34px,5.4vw,52px);font-weight:700;line-height:1.04;
+  margin:0 0 14px;letter-spacing:-.012em;text-wrap:balance}
+.hero h1 em{font-style:normal;color:var(--rubric)}
+.hero p{font-family:var(--f-scr);font-size:19px;line-height:1.62;color:var(--ink-2);margin:0 0 22px}
+.hero .cta{display:flex;gap:9px;flex-wrap:wrap}
+.btn{padding:10px 17px;border-radius:var(--rd);font-size:13px;font-weight:500;border:1px solid var(--rule);
+  color:var(--ink-2);background:var(--sheet);transition:all .14s;letter-spacing:.01em}
+.btn:hover{border-color:var(--rubric-mid);color:var(--rubric)}
+.btn.pri{background:var(--rubric);border-color:var(--rubric);color:#fff}
+.btn.pri:hover{background:#8d1f1a;border-color:#8d1f1a;color:#fff}
+:root[data-theme="dark"] .btn.pri,:root:not([data-theme="light"]) .btn.pri{color:#1A1A17}
+
+.figures{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--rule);
+  border:1px solid var(--rule);border-radius:var(--rd);margin:38px 0 34px;overflow:hidden}
+.fig{background:var(--sheet);padding:15px 16px}
+.fig b{display:block;font-size:25px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--rubric);line-height:1.1}
+.fig span{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.085em;color:var(--muted);margin-top:5px;line-height:1.4}
+
+.sect-h{font-size:10.5px;text-transform:uppercase;letter-spacing:.11em;color:var(--muted);margin:0 0 12px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(238px,1fr));gap:12px}
+.card{text-align:left;background:var(--sheet);border:1px solid var(--rule);border-radius:var(--rd);padding:16px;
+  display:flex;flex-direction:column;gap:7px;transition:all .14s;box-shadow:var(--sh-1)}
+.card:hover{border-color:var(--rubric-mid);box-shadow:var(--sh-2);transform:translateY(-1px)}
+.card .ic{color:var(--rubric);width:18px;height:18px}
+.card .ic svg{width:18px;height:18px;display:block}
+.card h3{font-family:var(--f-scr);font-size:18.5px;font-weight:600;margin:0;line-height:1.2}
+.card p{font-size:12.5px;line-height:1.55;color:var(--muted);margin:0}
+.card .meta{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent-2);margin-top:auto;padding-top:5px}
+
+.resume{display:flex;align-items:center;gap:14px;background:var(--raise);border:1px solid var(--rule);
+  border-left:3px solid var(--rubric);border-radius:var(--rd);padding:13px 15px;margin-bottom:28px;text-align:left;width:100%}
+.resume:hover{background:var(--sheet);box-shadow:var(--sh-1)}
+.resume .rl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.resume .rr{font-family:var(--f-scr);font-size:20px;font-weight:600;color:var(--ink);line-height:1.2;margin-top:2px}
+.resume .go{margin-left:auto;font-size:12px;color:var(--rubric);white-space:nowrap}
+
+.prov{margin-top:44px;border-top:1px solid var(--rule);padding-top:20px;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:20px}
+.prov div{font-size:11.5px;line-height:1.65;color:var(--muted)}
+.prov b{display:block;color:var(--ink-2);font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;font-weight:600}
+.prov a{color:var(--accent-2)}
+
+/* ============ reader ============ */
+.cols{flex:1 1 auto;display:grid;grid-template-columns:218px minmax(0,1fr) 348px;min-height:0}
+.rail{border-right:1px solid var(--rule);overflow-y:auto;padding:10px 0 50px;background:var(--sheet)}
+.rgrp{font-size:10px;text-transform:uppercase;letter-spacing:.11em;color:var(--muted);padding:15px 16px 6px}
+.bk{display:flex;justify-content:space-between;gap:8px;align-items:baseline;width:100%;text-align:left;
+  padding:3.5px 16px;font-family:var(--f-scr);font-size:15.5px;color:var(--ink-2);line-height:1.45}
+.bk:hover{background:var(--rubric-soft);color:var(--rubric)}
+.bk.on{color:var(--rubric);font-weight:600;background:var(--rubric-soft)}
+.bk .ct{font-family:var(--f-ui);font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums}
+.chaps{display:flex;flex-wrap:wrap;gap:3px;padding:7px 14px 12px}
+.cp{min-width:26px;text-align:center;padding:3.5px 4px;font-size:11.5px;border:1px solid var(--rule-2);
+  border-radius:2px;color:var(--ink-2);font-variant-numeric:tabular-nums;transition:all .1s}
+.cp:hover{border-color:var(--rubric-mid);color:var(--rubric)}
+.cp.on{background:var(--rubric);border-color:var(--rubric);color:var(--sheet);font-weight:600}
+
+.read{overflow-y:auto;padding:30px 0 90px;min-width:0;position:relative}
+.readin{max-width:var(--lw);margin:0 auto;padding-inline:20px}
+.ch-h{font-family:var(--f-scr);font-size:30px;font-weight:700;letter-spacing:-.006em;margin:0 0 4px;text-wrap:balance}
+.ch-s{font-size:11.5px;color:var(--muted);letter-spacing:.02em;margin-bottom:24px;font-variant-numeric:tabular-nums}
+.ch-s i{font-style:normal;color:var(--rubric);font-weight:600}
+.body{font-family:var(--f-scr);font-size:var(--fs);line-height:1.74;color:var(--ink)}
+.v{display:inline;border-radius:2px;padding:1px 0;transition:background .12s}
+.v.lk{cursor:pointer}
+.v.lk:hover{background:var(--rubric-soft)}
+.v.on{background:var(--sel);box-shadow:0 0 0 3px var(--sel)}
+.vn{font-family:var(--f-ui);font-size:9.5px;font-weight:600;vertical-align:.42em;margin-right:3px;
+  color:var(--muted);font-variant-numeric:tabular-nums}
+.v.lk .vn{color:var(--rubric)}
+.nav-ch{display:flex;justify-content:space-between;gap:12px;max-width:var(--lw);margin:38px auto 0;padding-inline:20px}
+.nb{font-size:12px;color:var(--muted);padding:8px 13px;border:1px solid var(--rule);border-radius:var(--rd);
+  background:var(--sheet);transition:all .12s}
+.nb:hover{color:var(--rubric);border-color:var(--rubric-mid)}
+.nb[disabled]{opacity:.3;cursor:default}
+.nb[disabled]:hover{color:var(--muted);border-color:var(--rule)}
+
+.refs{border-left:1px solid var(--rule);background:var(--sheet);overflow-y:auto;display:flex;flex-direction:column;min-width:0}
+.rhead{padding:16px 17px 13px;border-bottom:1px solid var(--rule);position:sticky;top:0;background:var(--sheet);z-index:2}
+.rref{font-family:var(--f-scr);font-size:20px;font-weight:600;color:var(--rubric);margin-bottom:2px;line-height:1.2}
+.rmeta{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-variant-numeric:tabular-nums}
+.rquote{font-family:var(--f-scr);font-size:15px;line-height:1.56;color:var(--ink-2);margin-top:10px;font-style:italic}
+.rlist{padding:2px 0 60px}
+.xr{display:block;width:100%;text-align:left;padding:11px 17px;border-bottom:1px solid var(--rule-2);transition:background .1s}
+.xr:hover{background:var(--rubric-soft)}
+.xr-t{display:flex;align-items:baseline;gap:8px}
+.xr-r{font-family:var(--f-scr);font-size:15.5px;font-weight:600;color:var(--rubric);white-space:nowrap}
+.xr-w{flex:1 1 auto;height:2px;background:var(--rule);border-radius:1px;overflow:hidden;position:relative;top:-3px}
+.xr-w i{display:block;height:100%;background:var(--rubric);opacity:.55}
+.xr-v{font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.xr-x{font-family:var(--f-scr);font-size:14.5px;line-height:1.5;color:var(--ink-2);margin-top:3px}
+.empty{padding:26px 17px;font-size:13px;color:var(--muted);line-height:1.65}
+.rclose{display:none}
+body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
+
+/* ============ places in text ============ */
+.pl{cursor:pointer;border-bottom:1px dotted var(--accent-2)}
+.pl:hover{background:var(--accent-soft)}
+.pl.on{background:var(--accent-soft)}
+
+/* ============ bubble ============ */
+.bub{position:fixed;z-index:70;width:258px;background:var(--sheet);border:1px solid var(--rule);
+  border-radius:5px;box-shadow:var(--sh-3);padding:13px 14px}
+.bub::after{content:"";position:absolute;left:var(--ax,24px);bottom:-7px;width:12px;height:12px;background:var(--sheet);
+  border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);transform:rotate(45deg)}
+.bub.below::after{bottom:auto;top:-7px;border:0;border-left:1px solid var(--rule);border-top:1px solid var(--rule)}
+.bub h4{font-family:var(--f-scr);font-size:19px;font-weight:600;margin:0;color:var(--accent-2);line-height:1.2}
+.bub .ty{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin:3px 0 9px}
+.bub dl{margin:0 0 11px;display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:12px}
+.bub dt{color:var(--muted)}
+.bub dd{margin:0;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.bub .row{display:flex;gap:6px}
+.bub .row button{flex:1 1 auto;padding:7px 9px;font-size:11.5px;border:1px solid var(--rule);border-radius:var(--rd);color:var(--ink-2)}
+.bub .row button.go{background:var(--accent-2);border-color:var(--accent-2);color:var(--sheet);font-weight:500}
+.bub .row button:hover{border-color:var(--rubric-mid);color:var(--rubric)}
+.bub .row button.go:hover{opacity:.88;color:var(--sheet)}
+
+/* ============ web view ============ */
+.webview{overflow-y:auto}
+.wv{max-width:1180px;margin:0 auto;padding:28px 16px 80px;width:100%}
+.wv h2{font-family:var(--f-scr);font-size:29px;font-weight:700;margin:0 0 7px;text-wrap:balance;letter-spacing:-.008em}
+.wv .lede{font-family:var(--f-scr);font-size:17.5px;line-height:1.6;color:var(--ink-2);max-width:58ch;margin:0 0 20px}
+.wv-ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:13px}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:var(--rd);overflow:hidden;background:var(--sheet)}
+.seg button{padding:6px 12px;font-size:11.5px;color:var(--muted);border-right:1px solid var(--rule);transition:all .12s}
+.seg button:last-child{border-right:0}
+.seg button:hover{color:var(--ink-2);background:var(--rule-2)}
+.seg button[aria-pressed="true"]{background:var(--rubric);color:#fff}
+:root[data-theme="dark"] .seg button[aria-pressed="true"],
+:root:not([data-theme="light"]) .seg button[aria-pressed="true"]{color:#1A1A17}
+.wv-wrap{position:relative;border:1px solid var(--rule);border-radius:var(--rd);background:var(--sheet);
+  overflow:hidden;box-shadow:var(--sh-1)}
+#arc{display:block;width:100%;cursor:crosshair}
+.wv-tip{position:absolute;pointer-events:none;background:var(--sheet);border:1px solid var(--rubric-mid);
+  border-radius:var(--rd);padding:8px 11px;font-size:12px;line-height:1.45;max-width:230px;
+  box-shadow:var(--sh-2);opacity:0;transition:opacity .1s}
+.wv-tip.on{opacity:1}
+.wv-tip b{font-family:var(--f-scr);font-size:15px;color:var(--rubric);display:block;margin-bottom:2px}
+.wv-tip i{font-style:normal;color:var(--muted);font-size:11px}
+.wv-key{display:flex;flex-wrap:wrap;gap:17px;margin-top:12px;font-size:11.5px;color:var(--muted)}
+.wv-key span{display:inline-flex;align-items:center;gap:6px}
+.wv-key em{width:17px;height:2px;border-radius:1px;font-style:normal}
+.wv-note{font-size:11.5px;color:var(--muted);margin-top:14px;line-height:1.65;max-width:64ch}
+.prog{position:absolute;left:0;bottom:0;height:2px;background:var(--rubric);width:0;transition:width .1s}
+
+/* ============ atlas view ============ */
+.atview{min-height:0}
+.at-h{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-bottom:1px solid var(--rule);
+  background:var(--sheet);flex:0 0 auto;flex-wrap:wrap}
+.at-back{font-size:12px;color:var(--accent-2);padding:5px 9px;border:1px solid var(--rule);border-radius:var(--rd);
+  white-space:nowrap;align-self:center}
+.at-back:hover{border-color:var(--rubric-mid);color:var(--rubric)}
+.at-h h3{font-family:var(--f-scr);font-size:22px;font-weight:600;margin:0;color:var(--accent-2);line-height:1.15}
+.at-h .sub{font-size:11.5px;color:var(--muted);margin-top:3px;letter-spacing:.01em;line-height:1.5}
+.at-h .sub b{color:var(--ink-2);font-weight:600}
+.at-sel{margin-left:auto;display:flex;align-items:center;gap:8px;flex:0 0 auto;align-self:center}
+.at-sel label{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+.at-sel select{font-size:12px;padding:5px 8px;background:var(--raise);color:var(--ink-2);
+  border:1px solid var(--rule);border-radius:var(--rd);max-width:210px}
+.at-map{position:relative;flex:1 1 auto;min-height:0;background:var(--paper)}
+#mapc{display:block;width:100%;height:100%;cursor:grab;touch-action:none}
+#mapc.drag{cursor:grabbing}
+.at-ctl{position:absolute;left:11px;top:11px;display:flex;flex-direction:column;gap:5px}
+.at-ctl button{width:29px;height:29px;background:var(--sheet);border:1px solid var(--rule);border-radius:var(--rd);
+  font-size:15px;line-height:1;color:var(--ink-2);box-shadow:var(--sh-1)}
+.at-ctl button:hover{border-color:var(--rubric-mid);color:var(--rubric)}
+.at-f{position:absolute;right:11px;top:11px;display:flex;flex-direction:column;gap:5px;align-items:flex-end}
+.at-f button{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--rd);padding:5px 10px;
+  font-size:11px;color:var(--muted);box-shadow:var(--sh-1)}
+.at-f button[aria-pressed="true"]{background:var(--rubric-soft);border-color:var(--rubric-mid);color:var(--rubric);font-weight:500}
+.at-f button[aria-pressed="true"]::before{content:"";width:5px;height:5px;border-radius:50%;
+  background:var(--rubric);display:inline-block;margin-right:6px;vertical-align:1px}
+.at-stops{display:flex;align-items:center;padding:8px 14px;border-top:1px solid var(--rule);
+  overflow-x:auto;scrollbar-width:thin;background:var(--raise);flex:0 0 auto}
+.stp{display:inline-flex;align-items:baseline;gap:5px;padding:4px 9px;border-radius:2px;white-space:nowrap;
+  font-size:12px;color:var(--ink-2)}
+.stp:hover{background:var(--accent-soft);color:var(--accent-2)}
+.stp.now{background:var(--accent-2);color:var(--sheet)}
+.stp b{font-variant-numeric:tabular-nums;font-size:10px;opacity:.7;font-weight:600}
+.stp i{font-style:normal;font-size:10px;opacity:.62}
+.stp-sep{color:var(--rule);font-size:11px;padding:0 1px;user-select:none}
+.at-lg{padding:9px 16px;border-top:1px solid var(--rule);display:flex;flex-wrap:wrap;gap:6px 18px;
+  font-size:10.5px;color:var(--muted);align-items:center;background:var(--sheet);flex:0 0 auto}
+.at-lg span{display:inline-flex;align-items:center;gap:6px}
+.at-lg i{width:15px;height:9px;border-radius:2px;display:inline-block}
+.at-note{width:100%;line-height:1.6;color:var(--muted);font-size:10.5px}
+
+/* ============ places view ============ */
+.plview{overflow-y:auto}
+.pv{max-width:1100px;margin:0 auto;padding:28px 16px 80px;width:100%}
+.pv h2{font-family:var(--f-scr);font-size:29px;font-weight:700;margin:0 0 7px;letter-spacing:-.008em}
+.pv .lede{font-family:var(--f-scr);font-size:17.5px;line-height:1.6;color:var(--ink-2);max-width:58ch;margin:0 0 20px}
+.pv-ctl{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.fld{display:flex;align-items:center;gap:8px;border:1px solid var(--rule);border-radius:var(--rd);
+  padding:7px 11px;background:var(--sheet);min-width:250px}
+.fld svg{width:14px;height:14px;color:var(--muted);flex:0 0 auto}
+.fld input{border:0;background:none;outline:0;width:100%;font-size:13px}
+.fld input::placeholder{color:var(--muted)}
+.pv-count{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums;margin-left:auto}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(216px,1fr));gap:9px}
+.pcard{text-align:left;background:var(--sheet);border:1px solid var(--rule);border-radius:var(--rd);
+  padding:11px 13px;transition:all .12s}
+.pcard:hover{border-color:var(--accent-2);box-shadow:var(--sh-1)}
+.pcard .pn{font-family:var(--f-scr);font-size:17px;font-weight:600;color:var(--ink);line-height:1.22}
+.pcard .pt{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:3px}
+.pcard .pm{font-size:11.5px;color:var(--accent-2);margin-top:6px;line-height:1.45}
+.pcard .pv2{font-size:10.5px;color:var(--muted);font-variant-numeric:tabular-nums;margin-top:4px}
+.more{display:block;margin:22px auto 0;padding:9px 20px;border:1px solid var(--rule);border-radius:var(--rd);
+  font-size:12.5px;color:var(--ink-2);background:var(--sheet)}
+.more:hover{border-color:var(--rubric-mid);color:var(--rubric)}
+
+/* ============ command palette ============ */
+.pal-scrim{position:fixed;inset:0;z-index:90;background:rgba(20,18,15,.42);display:flex;
+  align-items:flex-start;justify-content:center;padding:12vh 16px 16px}
+.pal{width:100%;max-width:560px;background:var(--sheet);border:1px solid var(--rule);border-radius:6px;
+  box-shadow:var(--sh-3);overflow:hidden;display:flex;flex-direction:column;max-height:70vh}
+.pal-in{display:flex;align-items:center;gap:10px;padding:13px 15px;border-bottom:1px solid var(--rule)}
+.pal-in svg{width:16px;height:16px;color:var(--muted);flex:0 0 auto}
+.pal-in input{border:0;background:none;outline:0;width:100%;font-size:16px;font-family:var(--f-scr)}
+.pal-in input::placeholder{color:var(--muted);font-family:var(--f-ui);font-size:14px}
+.pal-res{overflow-y:auto;padding:5px 0 7px}
+.pr{display:flex;align-items:baseline;gap:10px;width:100%;text-align:left;padding:8px 15px}
+.pr:hover,.pr.sel{background:var(--rubric-soft)}
+.pr .pr-n{font-family:var(--f-scr);font-size:16px;color:var(--ink);line-height:1.25}
+.pr.sel .pr-n{color:var(--rubric)}
+.pr .pr-k{font-size:9.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);
+  border:1px solid var(--rule);border-radius:2px;padding:1px 5px;flex:0 0 auto}
+.pr .pr-d{font-size:11.5px;color:var(--muted);margin-left:auto;white-space:nowrap;font-variant-numeric:tabular-nums}
+.pal-hint{padding:8px 15px;border-top:1px solid var(--rule);font-size:10.5px;color:var(--muted);
+  display:flex;gap:14px;background:var(--raise)}
+.pal-hint b{font-weight:600;color:var(--ink-2)}
+
+/* ============ settings sheet ============ */
+.set{position:fixed;right:12px;top:56px;z-index:80;width:252px;background:var(--sheet);border:1px solid var(--rule);
+  border-radius:5px;box-shadow:var(--sh-3);padding:13px 14px}
+.set h4{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:0 0 9px;font-weight:600}
+.set .grp{margin-bottom:15px}
+.set .grp:last-child{margin-bottom:0}
+.set .seg{width:100%}
+.set .seg button{flex:1 1 0;text-align:center}
+
+/* ============ mobile tabs ============ */
+.tabs{display:none;flex:0 0 auto;border-top:1px solid var(--rule);background:var(--sheet);
+  padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs button{flex:1 1 0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 2px 7px;
+  font-size:9.5px;color:var(--muted);letter-spacing:.02em}
+.tabs button svg{width:17px;height:17px}
+.tabs button[aria-current="page"]{color:var(--rubric)}
+
+/* ============ loading ============ */
+.skel{height:14px;border-radius:2px;background:linear-gradient(90deg,var(--rule-2),var(--rule),var(--rule-2));
+  background-size:200% 100%;animation:sk 1.3s linear infinite;margin-bottom:10px}
+@keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+@media (max-width:1080px){ .cols{grid-template-columns:190px minmax(0,1fr) 304px} }
+@media (max-width:900px){
+  .nav button{padding:7px 9px;font-size:12px}
+  .sbtn{min-width:40px}
+  .sbtn span,.sbtn kbd{display:none}
+}
+@media (max-width:820px){
+  .topin{height:48px;padding:0 10px}
+  .nav{display:none}
+  .tabs{display:flex}
+  .cols{grid-template-columns:minmax(0,1fr)}
+  .rail{position:fixed;inset:0 auto 0 0;width:258px;z-index:60;transform:translateX(-101%);
+    transition:transform .2s;box-shadow:var(--sh-3)}
+  body.navopen .rail{transform:none}
+  .refs{position:fixed;inset:auto 0 0 0;max-height:74%;z-index:61;border-left:0;border-top:1px solid var(--rule);
+    border-radius:11px 11px 0 0;box-shadow:0 -6px 34px rgba(0,0,0,.22)}
+  .rclose{display:block;position:absolute;right:11px;top:13px;font-size:19px;color:var(--muted);line-height:1;padding:4px 8px;z-index:3}
+  .read{padding-top:20px}
+  .hm{padding-top:26px}
+  .hero h1{font-size:33px}
+  .at-sel{margin-left:0;width:100%}
+  .at-sel select{max-width:none;flex:1 1 auto}
+  .pal-scrim{padding-top:7vh}
+  .set{right:8px;left:8px;width:auto}
+}
+@media (min-width:821px){ .m-only{display:none!important} }
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="topin">
+      <button class="ibtn m-only" id="navbtn" aria-label="Books">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h12M2 12h12"/></svg>
+      </button>
+      <div class="mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <path d="M3 20c4-10 14-10 18 0" stroke="var(--rubric)"/>
+          <path d="M3 4c4 10 14 10 18 0" stroke="var(--accent-2)"/>
+          <circle cx="12" cy="12" r="1.5" fill="var(--rubric)" stroke="none"/>
+        </svg>
+        <div class="wordmark">Cross<em>weave</em></div>
+      </div>
+      <nav class="nav" id="nav">
+        <button data-view="home">Home</button>
+        <button data-view="read" aria-current="page">Read</button>
+        <button data-view="web">The Web</button>
+        <button data-view="atlas">Atlas</button>
+        <button data-view="places">Places</button>
+      </nav>
+      <div class="spacer"></div>
+      <button class="sbtn" id="searchbtn">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="width:14px;height:14px;flex:0 0 auto">
+          <circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>
+        <span>Search scripture &amp; places</span><kbd>&#8984;K</kbd>
+      </button>
+      <button class="tpill" id="trbtn" title="Switch translation">&mdash;</button>
+      <button class="ibtn" id="setbtn" aria-label="Reading settings">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M2 4h12M2 8h8M2 12h10"/></svg>
+      </button>
+    </div>
+    <div class="trail" id="trail"></div>
+  </header>
+
+  <div class="views">
+
+    <!-- ========== HOME ========== -->
+    <section class="view home" id="v-home" hidden>
+      <div class="hm">
+        <div class="hero">
+          <h1>The Bible references <em>itself</em> almost everywhere.</h1>
+          <p>Crossweave is a reader built on that fact. Every verse is a doorway into the passages
+          that reach into it, every place name opens onto a map, and the trail across the top keeps
+          the path you followed in view.</p>
+          <div class="cta">
+            <button class="btn pri" data-go="read">Start reading</button>
+            <button class="btn" data-go="web">See the whole web</button>
+          </div>
+        </div>
+
+        <div class="figures">
+          <div class="fig"><b id="f1">&mdash;</b><span>Verses linked</span></div>
+          <div class="fig"><b id="f2">&mdash;</b><span>Cross-references</span></div>
+          <div class="fig"><b id="f3">&mdash;</b><span>Places mapped</span></div>
+          <div class="fig"><b id="f4">7</b><span>Journeys traced</span></div>
+          <div class="fig"><b id="f5">2</b><span>Translations</span></div>
+        </div>
+
+        <button class="resume" id="resume" hidden>
+          <div>
+            <div class="rl">Pick up where you left off</div>
+            <div class="rr" id="resume-ref">&mdash;</div>
+          </div>
+          <div class="go">Continue &rarr;</div>
+        </button>
+
+        <h2 class="sect-h">Four ways in</h2>
+        <div class="cards">
+          <button class="card" data-go="read">
+            <div class="ic"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M3 4h5.5a2 2 0 012 2v10a1.5 1.5 0 00-1.5-1.5H3zM17 4h-5.5a2 2 0 00-2 2v10a1.5 1.5 0 011.5-1.5H17z"/></svg></div>
+            <h3>The reader</h3>
+            <p>Tap any verse to open its cross-references in full, each weighted by how strongly
+            readers connect the two. Follow one and the trail remembers.</p>
+            <div class="meta">66 books &middot; both testaments</div>
+          </button>
+          <button class="card" data-go="web">
+            <div class="ic"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M2 15c3-9 13-9 16 0M5 15c2-5 8-5 10 0"/><path d="M2 17h16"/></svg></div>
+            <h3>The web</h3>
+            <p>All 1,189 chapters on one axis, every cross-reference drawn as an arc above them.
+            Nearly a third of the links jump between the Testaments.</p>
+            <div class="meta">133,612 chapter links</div>
+          </button>
+          <button class="card" data-go="atlas">
+            <div class="ic"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M2 5l5.5-2 5 2L18 3v12l-5.5 2-5-2L2 17z"/><path d="M7.5 3v12M12.5 5v12"/></svg></div>
+            <h3>The atlas</h3>
+            <p>Ancient places and kingdom extents drawn over modern coastlines and borders,
+            so you can see what the land is called today.</p>
+            <div class="meta">Journeys &middot; kingdoms &middot; sites</div>
+          </button>
+          <button class="card" data-go="places">
+            <div class="ic"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M10 18s6-5.2 6-9.5A6 6 0 004 8.5C4 12.8 10 18 10 18z"/><circle cx="10" cy="8.5" r="2"/></svg></div>
+            <h3>The gazetteer</h3>
+            <p>Every identifiable place in scripture, searchable, with its modern site name
+            and how many verses mention it.</p>
+            <div class="meta">1,335 places</div>
+          </button>
+        </div>
+
+        <div class="prov">
+          <div><b>Scripture text</b>Berean Standard Bible, dedicated to the public domain in 2023, with the
+          King James Version alongside it. Both are free to redistribute, which is what keeps this free to use.</div>
+          <div><b>Cross-references</b>openBible.info, CC&nbsp;BY. Community-voted, so each link carries a real
+          strength rather than an editorial ranking.</div>
+          <div><b>Places</b>openBible Bible-Geocoding-Data, CC&nbsp;BY. Modern coastlines and borders from
+          <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a>, public domain.</div>
+          <div><b>On the kingdoms</b>Ancient borders were never fixed lines. Extents marked
+          &ldquo;approximate&rdquo; are schematic, drawn for one moment in a kingdom&rsquo;s history &mdash; never
+          survey lines.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== READ ========== -->
+    <section class="view" id="v-read">
+      <div class="cols">
+        <nav class="rail" id="rail"></nav>
+        <main class="read" id="read">
+          <div class="readin">
+            <h1 class="ch-h" id="chh">&nbsp;</h1>
+            <div class="ch-s" id="chs"></div>
+            <div class="body" id="body"></div>
+          </div>
+          <div class="nav-ch">
+            <button class="nb" id="prev">&larr; Previous</button>
+            <button class="nb" id="next">Next &rarr;</button>
+          </div>
+        </main>
+        <aside class="refs" id="refs">
+          <button class="rclose" id="rclose" aria-label="Close">&times;</button>
+          <div class="rhead">
+            <div class="rref" id="rref">&mdash;</div>
+            <div class="rmeta" id="rmeta"></div>
+            <div class="rquote" id="rquote"></div>
+          </div>
+          <div class="rlist" id="rlist"></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ========== WEB ========== -->
+    <section class="view webview" id="v-web" hidden>
+      <div class="wv">
+        <h2>The whole canon, wired together</h2>
+        <p class="lede">Every chapter of scripture sits along the bottom in order, Genesis at the left
+        and Revelation at the right, each bar as tall as the chapter is long. Every arc above is a
+        cross-reference running between two chapters. Red arcs cross between the Testaments.</p>
+        <div class="figures" style="margin:0 0 18px">
+          <div class="fig"><b id="n1">1,189</b><span>Chapters</span></div>
+          <div class="fig"><b id="n2">133,612</b><span>Chapter links</span></div>
+          <div class="fig"><b id="n3">29.6%</b><span>Cross the Testaments</span></div>
+          <div class="fig"><b id="n4">455,806</b><span>Verse references</span></div>
+        </div>
+        <div class="wv-ctl">
+          <div class="seg" id="filtseg">
+            <button data-f="all" aria-pressed="true">All links</button>
+            <button data-f="x" aria-pressed="false">Cross-Testament only</button>
+            <button data-f="strong" aria-pressed="false">Strongest 10%</button>
+          </div>
+        </div>
+        <div class="wv-wrap">
+          <canvas id="arc"></canvas>
+          <div class="wv-tip" id="tip"></div>
+          <div class="prog" id="prog"></div>
+        </div>
+        <div class="wv-key">
+          <span><em style="background:var(--arc-in)"></em> Within a Testament</span>
+          <span><em style="background:var(--arc-x)"></em> Old Testament &harr; New Testament</span>
+          <span><em style="background:var(--bar)"></em> Chapter, bar height = verse count</span>
+        </div>
+        <p class="wv-note">Hover a chapter to isolate its own threads. Click one to open it in the reader.
+        Arc brightness follows reference strength, so the densest seams &mdash; Isaiah into the Gospels,
+        Psalms into Hebrews, Exodus into Revelation &mdash; surface on their own.</p>
+      </div>
+    </section>
+
+    <!-- ========== ATLAS ========== -->
+    <section class="view atview" id="v-atlas" hidden>
+      <div class="at-h">
+        <button class="at-back" id="atback" hidden>&larr; Back to reading</button>
+        <div>
+          <h3 id="atname">The atlas</h3>
+          <div class="sub" id="atsub">Pick a journey, or open a place from the reader.</div>
+        </div>
+        <div class="at-sel">
+          <label for="jsel">Journey</label>
+          <select id="jsel"><option value="">None</option></select>
+        </div>
+      </div>
+      <div class="at-map">
+        <canvas id="mapc"></canvas>
+        <div class="at-ctl">
+          <button id="zin" aria-label="Zoom in">+</button>
+          <button id="zout" aria-label="Zoom out">&minus;</button>
+          <button id="zfit" aria-label="Recentre" title="Recentre">&#9678;</button>
+        </div>
+        <div class="at-f">
+          <button id="tgK" aria-pressed="true">Kingdoms</button>
+          <button id="tgN" aria-pressed="true">Modern borders</button>
+          <button id="tgP" aria-pressed="true">Nearby places</button>
+        </div>
+      </div>
+      <div class="at-stops" id="atstops" hidden></div>
+      <div class="at-lg">
+        <span><i style="background:var(--rubric)"></i> This place</span>
+        <span><i style="background:rgba(46,74,92,.30);border:1px solid var(--accent-2)"></i> Mapped boundary (openBible)</span>
+        <span><i style="background:rgba(163,37,32,.16);border:1px dashed var(--rubric)"></i> Kingdom, approximate extent</span>
+        <span><i style="background:var(--accent-2);height:3px"></i> Journey route</span>
+        <p class="at-note">Modern coastlines and national borders are drawn from Natural Earth. Ancient boundaries were never
+        fixed lines &mdash; kingdom extents shown here are schematic, drawn for a single moment in that kingdom's history.</p>
+      </div>
+    </section>
+
+    <!-- ========== PLACES ========== -->
+    <section class="view plview" id="v-places" hidden>
+      <div class="pv">
+        <h2>Every place in scripture</h2>
+        <p class="lede">One thousand three hundred and thirty-five identifiable places, each with the
+        modern site it is matched to and the number of verses that name it.</p>
+        <div class="pv-ctl">
+          <div class="fld">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>
+            <input id="pq" type="text" placeholder="Search places" autocomplete="off">
+          </div>
+          <div class="seg" id="ptype">
+            <button data-t="" aria-pressed="true">All</button>
+            <button data-t="settlement" aria-pressed="false">Settlements</button>
+            <button data-t="region" aria-pressed="false">Regions</button>
+            <button data-t="water" aria-pressed="false">Water</button>
+            <button data-t="terrain" aria-pressed="false">Terrain</button>
+          </div>
+          <div class="pv-count" id="pcount"></div>
+        </div>
+        <div class="pgrid" id="pgrid"></div>
+        <button class="more" id="pmore" hidden>Show more</button>
+      </div>
+    </section>
+  </div>
+
+  <nav class="tabs" id="tabs">
+    <button data-view="home" aria-label="Home">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l7-6 7 6v8H3z"/></svg>Home</button>
+    <button data-view="read" aria-current="page" aria-label="Read">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h6a1.5 1.5 0 011.5 1.5V17a1.5 1.5 0 00-1.5-1.5H3zM17 4h-6A1.5 1.5 0 009.5 5.5V17a1.5 1.5 0 011.5-1.5h6z"/></svg>Read</button>
+    <button data-view="web" aria-label="Web">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 15c3-9 13-9 16 0M5 15c2-5 8-5 10 0"/></svg>Web</button>
+    <button data-view="atlas" aria-label="Atlas">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 5l5.5-2 5 2L18 3v12l-5.5 2-5-2L2 17z"/></svg>Atlas</button>
+    <button data-view="places" aria-label="Places">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 18s6-5.2 6-9.5A6 6 0 004 8.5C4 12.8 10 18 10 18z"/><circle cx="10" cy="8.5" r="2"/></svg>Places</button>
+  </nav>
+</div>
+
+<div class="bub" id="bub" hidden></div>
+
+<div class="set" id="setpanel" hidden>
+  <div class="grp">
+    <h4>Theme</h4>
+    <div class="seg" id="themeseg">
+      <button data-th="light">Light</button>
+      <button data-th="system" aria-pressed="true">System</button>
+      <button data-th="dark">Dark</button>
+    </div>
+  </div>
+  <div class="grp">
+    <h4>Text size</h4>
+    <div class="seg" id="sizeseg">
+      <button data-sz="16.5">Small</button>
+      <button data-sz="18.5" aria-pressed="true">Medium</button>
+      <button data-sz="21">Large</button>
+    </div>
+  </div>
+  <div class="grp">
+    <h4>Column width</h4>
+    <div class="seg" id="widthseg">
+      <button data-lw="30em">Narrow</button>
+      <button data-lw="34em" aria-pressed="true">Default</button>
+      <button data-lw="42em">Wide</button>
+    </div>
+  </div>
+  <div class="grp">
+    <h4>Reference density</h4>
+    <div class="seg" id="densseg">
+      <button data-d="0" aria-pressed="true">Off</button>
+      <button data-d="1">Shade verses</button>
+    </div>
+  </div>
+</div>
+
+<div class="pal-scrim" id="palscrim" hidden>
+  <div class="pal" role="dialog" aria-modal="true" aria-label="Search">
+    <div class="pal-in">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>
+      <input id="palq" type="text" placeholder="Try &ldquo;John 3:16&rdquo;, &ldquo;Nineveh&rdquo;, or &ldquo;voyage&rdquo;" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="pal-res" id="palres"></div>
+    <div class="pal-hint">
+      <span><b>&uarr;&darr;</b> navigate</span><span><b>&crarr;</b> open</span><span><b>esc</b> close</span>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var IDX=null, BOOKS=[], CACHE={}, XC={}, TC={}, TRS=[], TR='bsb', PL=null, SPN={},
+      BASE=null, KING=null, curPlace=null, cur={b:0,c:1,v:1}, trail=[], booting=true,
+      view='read', retView=null;
+  var $=function(id){return document.getElementById(id)};
+  var LS={
+    get:function(k,d){ try{var v=localStorage.getItem(k); return v===null?d:v}catch(e){return d} },
+    set:function(k,v){ try{localStorage.setItem(k,v)}catch(e){} }
+  };
+
+  /* ---------- shared helpers ---------- */
+  function locate(g){
+    var lo=0,hi=BOOKS.length-1,bi=0;
+    while(lo<=hi){var m=(lo+hi)>>1; if(BOOKS[m].s<=g){bi=m;lo=m+1}else{hi=m-1}}
+    var off=g-BOOKS[bi].s, cc=BOOKS[bi].c;
+    for(var i=0;i<cc.length;i++){ if(off<cc[i]) return {b:bi,c:i+1,v:off+1}; off-=cc[i]; }
+    return {b:bi,c:cc.length,v:cc[cc.length-1]};
+  }
+  function gidx(b,c,v){var s=BOOKS[b].s;for(var i=0;i<c-1;i++)s+=BOOKS[b].c[i];return s+v-1}
+  function label(l){return BOOKS[l.b].n+' '+l.c+':'+l.v}
+  function rangeLabel(a,b){
+    if(a.b===b.b&&a.c===b.c&&a.v===b.v) return label(a);
+    if(a.b===b.b&&a.c===b.c) return BOOKS[a.b].n+' '+a.c+':'+a.v+'\u2013'+b.v;
+    return label(a)+'\u2013'+(a.b===b.b?b.c+':'+b.v:label(b));
+  }
+  function jget(u){return fetch(u).then(function(r){return r.json()})}
+  function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+  function nfm(n){ return Number(n).toLocaleString() }
+
+  function loadSpans(bi){
+    var k=TR+'_'+bi;
+    if(SPN[k]) return Promise.resolve(SPN[k]);
+    return jget('data/geo/'+TR+'-'+bi+'.json').then(function(j){SPN[k]=j;return j})
+      .catch(function(){SPN[k]={};return {}});
+  }
+  function load(bi){
+    if(CACHE[bi]) return Promise.resolve(CACHE[bi]);
+    var pX = XC[bi] ? Promise.resolve(XC[bi]) : jget('data/x/'+bi+'.json').then(function(j){XC[bi]=j;return j});
+    var k = TR+'_'+bi;
+    var pT = TC[k] ? Promise.resolve(TC[k]) : jget('data/'+TR+'/'+bi+'.json').then(function(j){TC[k]=j;return j});
+    return Promise.all([pT,pX,loadSpans(bi)]).then(function(a){ CACHE[bi]={t:a[0],x:a[1]}; return CACHE[bi]; });
+  }
+  function verseHTML(txt, spans){
+    if(!spans || !spans.length || !PL) return esc(txt);
+    var out='', last=0;
+    for(var i=0;i<spans.length;i++){
+      var s0=spans[i];
+      if(s0[0]<last) continue;
+      out += esc(txt.slice(last, s0[0]));
+      out += '<span class="pl" data-p="'+s0[2]+'">'+esc(txt.slice(s0[0], s0[1]))+'</span>';
+      last = s0[1];
+    }
+    return out + esc(txt.slice(last));
+  }
+
+  /* ---------- router ---------- */
+  var VIEWS=['home','read','web','atlas','places'];
+  function setView(v, opts){
+    if(VIEWS.indexOf(v)<0) v='read';
+    view=v;
+    for(var i=0;i<VIEWS.length;i++) $('v-'+VIEWS[i]).hidden = (VIEWS[i]!==v);
+    [$('nav'),$('tabs')].forEach(function(host){
+      var bs=host.querySelectorAll('button');
+      for(var k=0;k<bs.length;k++){
+        if(bs[k].dataset.view===v) bs[k].setAttribute('aria-current','page');
+        else bs[k].removeAttribute('aria-current');
+      }
+    });
+    LS.set('cw.view', v);
+    $('trail').hidden = (v!=='read');
+    closeBubble(); $('setpanel').hidden=true;
+    document.body.classList.remove('navopen');
+    if(v==='web') loadArcs();
+    if(v==='atlas') openAtlasView(opts||{});
+    if(v==='places') initPlaces();
+    if(v==='home') refreshHome();
+  }
+  function navClick(e){
+    var b=e.target.closest('button[data-view]');
+    if(b) setView(b.dataset.view);
+  }
+  $('nav').addEventListener('click', navClick);
+  $('tabs').addEventListener('click', navClick);
+  document.addEventListener('click', function(e){
+    var g=e.target.closest('[data-go]');
+    if(g) setView(g.dataset.go);
+  });
+
+  /* ---------- home ---------- */
+  function refreshHome(){
+    if(!IDX) return;
+    var lk=IDX.linked.reduce(function(a,b){return a+b},0);
+    $('f1').textContent=nfm(lk);
+    $('f2').textContent=nfm(IDX.totalEdges);
+    $('f3').textContent=PL?nfm(Object.keys(PL).length):'1,335';
+    $('f5').textContent=TRS.length;
+    var p=null; try{p=JSON.parse(LS.get('cw.pos','null'))}catch(e){}
+    if(p&&typeof p.b==='number'&&BOOKS[p.b]){
+      $('resume').hidden=false;
+      $('resume-ref').textContent=BOOKS[p.b].n+' '+p.c+(p.v?':'+p.v:'');
+    }
+  }
+  $('resume').addEventListener('click',function(){
+    var p=null; try{p=JSON.parse(LS.get('cw.pos','null'))}catch(e){}
+    setView('read'); if(p) go(p.b,p.c,p.v||1,true);
+  });
+
+  /* ---------- translation ---------- */
+  function trMeta(){ for(var i=0;i<TRS.length;i++) if(TRS[i].id===TR) return TRS[i]; return TRS[0]||{short:'',note:'',name:''} }
+  function setStat(){
+    var m=trMeta();
+    $('trbtn').textContent=m.short;
+    $('trbtn').title=m.name+' \u2014 '+m.note+' (click to switch)';
+  }
+  function switchTrans(id){
+    if(id===TR) return;
+    TR=id; CACHE={};
+    LS.set('cw.tr',id);
+    setStat();
+    load(cur.b).then(function(d){ render(d); if(cur.v) showRefs(cur.b,cur.c,cur.v); });
+  }
+  $('trbtn').addEventListener('click',function(){
+    if(TRS.length<2) return;
+    var i=0; for(var k=0;k<TRS.length;k++) if(TRS[k].id===TR) i=k;
+    switchTrans(TRS[(i+1)%TRS.length].id);
+  });
+
+  /* ---------- settings ---------- */
+  function applyPrefs(){
+    var th=LS.get('cw.th','system');
+    if(th==='system') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme',th);
+    mark('themeseg','th',th);
+    var sz=LS.get('cw.fs','18.5');
+    document.documentElement.style.setProperty('--fs', sz+'px');
+    mark('sizeseg','sz',sz);
+    var lw=LS.get('cw.lw','34em');
+    document.documentElement.style.setProperty('--lw', lw);
+    mark('widthseg','lw',lw);
+    var d=LS.get('cw.dens','0');
+    document.body.classList.toggle('dens', d==='1');
+    mark('densseg','d',d);
+  }
+  function mark(seg,attr,val){
+    var bs=$(seg).querySelectorAll('button');
+    for(var i=0;i<bs.length;i++) bs[i].setAttribute('aria-pressed', bs[i].dataset[attr]===val?'true':'false');
+  }
+  $('setbtn').addEventListener('click',function(e){
+    e.stopPropagation(); $('setpanel').hidden=!$('setpanel').hidden;
+  });
+  $('setpanel').addEventListener('click',function(e){
+    e.stopPropagation();
+    var b=e.target.closest('button'); if(!b) return;
+    if(b.dataset.th!==undefined){ LS.set('cw.th',b.dataset.th); applyPrefs(); redrawAll(); }
+    if(b.dataset.sz!==undefined){ LS.set('cw.fs',b.dataset.sz); applyPrefs(); }
+    if(b.dataset.lw!==undefined){ LS.set('cw.lw',b.dataset.lw); applyPrefs(); }
+    if(b.dataset.d!==undefined){ LS.set('cw.dens',b.dataset.d); applyPrefs(); }
+  });
+  document.addEventListener('click',function(e){
+    if(!e.target.closest('#setpanel') && !e.target.closest('#setbtn')) $('setpanel').hidden=true;
+  });
+  function redrawAll(){
+    if(AR && view==='web') setTimeout(resizeArc,40);
+    if(view==='atlas') setTimeout(function(){ sizeMap(); drawMap() },40);
+  }
+
+  /* ---------- rail ---------- */
+  function buildRail(){
+    var r=$('rail'), h='';
+    h+='<div class="rgrp">Old Testament</div>';
+    for(var i=0;i<66;i++){
+      if(i===39) h+='<div class="rgrp">New Testament</div>';
+      h+='<button class="bk" data-b="'+i+'"><span>'+BOOKS[i].n+'</span><span class="ct">'+BOOKS[i].c.length+'</span></button>'
+        +'<div class="chaps" data-cw="'+i+'" hidden></div>';
+    }
+    r.innerHTML=h;
+    r.addEventListener('click',function(e){
+      var bk=e.target.closest('.bk');
+      if(bk){ openBook(+bk.dataset.b, true); return; }
+      var cp=e.target.closest('.cp');
+      if(cp){ go(+cp.dataset.b, +cp.dataset.c, null, true); document.body.classList.remove('navopen'); }
+    });
+  }
+  function openBook(bi, scroll){
+    var all=$('rail').querySelectorAll('.chaps');
+    for(var i=0;i<all.length;i++){
+      var b=+all[i].dataset.cw, open=(b===bi);
+      all[i].hidden=!open;
+      if(open && !all[i].innerHTML){
+        var h='';
+        for(var c=1;c<=BOOKS[b].c.length;c++) h+='<button class="cp" data-b="'+b+'" data-c="'+c+'">'+c+'</button>';
+        all[i].innerHTML=h;
+      }
+    }
+    var bks=$('rail').querySelectorAll('.bk');
+    for(var j=0;j<bks.length;j++) bks[j].classList.toggle('on', +bks[j].dataset.b===bi);
+    if(scroll){ var el=$('rail').querySelector('.bk[data-b="'+bi+'"]'); if(el) el.scrollIntoView({block:'nearest'}); }
+    markChaps();
+  }
+  function markChaps(){
+    var cps=$('rail').querySelectorAll('.cp');
+    for(var i=0;i<cps.length;i++) cps[i].classList.toggle('on', +cps[i].dataset.b===cur.b && +cps[i].dataset.c===cur.c);
+  }
+
+  /* ---------- chapter ---------- */
+  function go(b,c,v,push){
+    if(b<0||b>65) return;
+    if(view!=='read') setView('read');
+    var nc=BOOKS[b].c.length; if(c<1)c=1; if(c>nc)c=nc;
+    cur={b:b,c:c,v:v||null};
+    openBook(b,false);
+    load(b).then(function(d){ render(d); if(v) select(b,c,v,push); else clearPanel(); });
+    LS.set('cw.pos',JSON.stringify(cur));
+  }
+  function render(d){
+    var verses=d.t[cur.c-1]||[], off=0;
+    for(var i=0;i<cur.c-1;i++) off+=BOOKS[cur.b].c[i];
+    var linked=0, edges=0, max=1, counts=[];
+    for(var k=0;k<verses.length;k++){
+      var xr=d.x[String(off+k)]; var n=xr?xr.length:0;
+      counts.push(n); if(n){linked++;edges+=n; if(n>max)max=n}
+    }
+    $('chh').textContent=BOOKS[cur.b].n+' '+cur.c;
+    $('chs').innerHTML=verses.length+' verses &middot; <i>'+linked+'</i> carry cross-references &middot; '
+      +nfm(edges)+' outbound links';
+    var sp = SPN[TR+'_'+cur.b] || {};
+    var h='';
+    for(var j=0;j<verses.length;j++){
+      var n2=counts[j], a=n2?(0.06+0.5*(n2/max)).toFixed(3):0;
+      h+='<span class="v'+(n2?' lk':'')+'" data-v="'+(j+1)+'" data-n="'+n2+'"'
+        +(n2?' role="button" tabindex="0" style="--dz:rgba(163,37,32,'+a+')"':'')
+        +'><span class="vn">'+(j+1)+'</span>'+verseHTML(verses[j], sp[cur.c+'.'+(j+1)])+'</span> ';
+    }
+    $('body').innerHTML=h;
+    $('prev').disabled = (cur.b===0 && cur.c===1);
+    $('next').disabled = (cur.b===65 && cur.c===BOOKS[65].c.length);
+    markChaps();
+    $('read').scrollTop=0;
+    paintSel();
+  }
+
+  /* ---------- selection + refs ---------- */
+  function select(b,c,v,push){
+    cur={b:b,c:c,v:v};
+    if(push){
+      var l={b:b,c:c,v:v};
+      if(!trail.length || gidx(trail[trail.length-1].b,trail[trail.length-1].c,trail[trail.length-1].v)!==gidx(b,c,v)){
+        trail.push(l); if(trail.length>14) trail.shift();
+      }
+      drawTrail();
+    }
+    paintSel(); showRefs(b,c,v);
+    LS.set('cw.pos',JSON.stringify(cur));
+  }
+  function paintSel(){
+    var vs=$('body').querySelectorAll('.v');
+    for(var i=0;i<vs.length;i++) vs[i].classList.toggle('on', +vs[i].dataset.v===cur.v);
+  }
+  function clearPanel(){
+    $('rref').textContent='\u2014'; $('rmeta').textContent='Select a verse to open its web';
+    $('rquote').textContent='';
+    $('rlist').innerHTML='<div class="empty">Every red verse number marks a verse that other passages reach into, or that reaches out. Tap one.</div>';
+    if(window.innerWidth<=820) $('refs').hidden=true;
+  }
+  function showRefs(b,c,v){
+    $('refs').hidden = !!(booting && window.innerWidth<=820);
+    booting=false;
+    var d=CACHE[b]; if(!d) return;
+    var off=0; for(var i=0;i<c-1;i++) off+=BOOKS[b].c[i];
+    var key=String(off+v-1), xr=d.x[key]||[];
+    $('rref').textContent=BOOKS[b].n+' '+c+':'+v;
+    $('rmeta').textContent = xr.length ? xr.length+' cross-references' : 'no recorded cross-references';
+    $('rquote').textContent='\u201C'+(d.t[c-1][v-1]||'')+'\u201D';
+    if(!xr.length){ $('rlist').innerHTML='<div class="empty">This verse sits outside the reference web \u2014 about 3% of verses do.</div>'; return; }
+    var max=xr[0][2]||1, h='';
+    for(var j=0;j<xr.length;j++){
+      var t=xr[j][0], sp=xr[j][1], w=xr[j][2];
+      var a=locate(t), z=locate(t+sp);
+      h+='<button class="xr" data-g="'+t+'">'
+        +'<span class="xr-t"><span class="xr-r">'+rangeLabel(a,z)+'</span>'
+        +'<span class="xr-w"><i style="width:'+Math.max(6,Math.round(100*w/max))+'%"></i></span>'
+        +'<span class="xr-v">'+w+'</span></span>'
+        +'<span class="xr-x" data-fill="'+t+'_'+sp+'">\u2026</span></button>';
+    }
+    $('rlist').innerHTML=h; $('rlist').scrollTop=0;
+    var need={};
+    for(var k=0;k<xr.length;k++) need[locate(xr[k][0]).b]=1;
+    Object.keys(need).forEach(function(bi){ load(+bi).then(fillText) });
+  }
+  function fillText(){
+    var slots=$('rlist').querySelectorAll('[data-fill]');
+    for(var i=0;i<slots.length;i++){
+      var p=slots[i].dataset.fill.split('_'), g=+p[0], sp=Math.min(+p[1],5), out=[], ok=true;
+      for(var k=0;k<=sp;k++){
+        var l=locate(g+k), dd=CACHE[l.b];
+        if(!dd){ok=false;break}
+        var tx=(dd.t[l.c-1]||[])[l.v-1]; if(tx) out.push(tx);
+      }
+      if(ok&&out.length){
+        var s=out.join(' ');
+        if(+p[1]>5) s+=' \u2026';
+        if(s.length>240) s=s.slice(0,238).replace(/\s\S*$/,'')+'\u2026';
+        slots[i].textContent=s; slots[i].removeAttribute('data-fill');
+      }
+    }
+  }
+  function drawTrail(){
+    if(!trail.length){ $('trail').innerHTML=''; return; }
+    var h='<span class="tlab">Trail</span>';
+    for(var i=0;i<trail.length;i++){
+      if(i) h+='<span class="arw">\u2192</span>';
+      h+='<button class="chip'+(i===trail.length-1?' now':'')+'" data-i="'+i+'">'+label(trail[i])+'</button>';
+    }
+    $('trail').innerHTML=h;
+    $('trail').scrollLeft=$('trail').scrollWidth;
+  }
+
+  /* ================= arc view ================= */
+  var AR=null, ADJ=null, base=null, cv=null, cx2=null, W=0,H=0,DPR=1,
+      arcFilt='all', hoverCh=-1, drawing=false, strongCut=0;
+  var PAD=16, BARH=44, LABH=17, BASEY=0;
+
+  function chX(i){ return PAD + (W-2*PAD) * (i+0.5) / AR.chaps.length }
+  function tokens(){
+    var cs=getComputedStyle(document.documentElement);
+    return { inn:cs.getPropertyValue('--arc-in').trim(), x:cs.getPropertyValue('--arc-x').trim(),
+             bar:cs.getPropertyValue('--bar').trim(), nt:cs.getPropertyValue('--bar-nt').trim(),
+             rule:cs.getPropertyValue('--rule').trim(), mut:cs.getPropertyValue('--muted').trim() };
+  }
+  function isX(i){ var a=AR.chaps[AR.a[i]][0], b=AR.chaps[AR.b[i]][0]; return (a<39)!==(b<39) }
+  function keep(i){
+    if(arcFilt==='x') return isX(i);
+    if(arcFilt==='strong') return AR.w[i]>=strongCut;
+    return true;
+  }
+  function arcPath(c,i,lw,alpha,col){
+    var xa=chX(AR.a[i]), xb=chX(AR.b[i]);
+    var rx=Math.abs(xb-xa)/2, mxx=(xa+xb)/2;
+    if(rx<0.6) return;
+    var ry=Math.min(rx, BASEY-6);
+    c.globalAlpha=alpha; c.strokeStyle=col; c.lineWidth=lw;
+    c.beginPath(); c.ellipse(mxx, BASEY, rx, ry, 0, Math.PI, 2*Math.PI); c.stroke();
+  }
+  function drawBars(c){
+    var t=tokens(), maxv=0, i;
+    for(i=0;i<AR.chaps.length;i++) if(AR.chaps[i][2]>maxv) maxv=AR.chaps[i][2];
+    var bw=Math.max(0.7,(W-2*PAD)/AR.chaps.length - 0.35);
+    c.globalAlpha=1;
+    for(i=0;i<AR.chaps.length;i++){
+      var h=4+(BARH-4)*AR.chaps[i][2]/maxv;
+      c.fillStyle = AR.chaps[i][0]<39 ? t.bar : t.nt;
+      c.fillRect(chX(i)-bw/2, BASEY+1, bw, h);
+    }
+    c.globalAlpha=1; c.strokeStyle=t.rule; c.lineWidth=1;
+    c.beginPath(); c.moveTo(PAD,BASEY+.5); c.lineTo(W-PAD,BASEY+.5); c.stroke();
+    var nt=0; for(i=0;i<AR.chaps.length;i++){ if(AR.chaps[i][0]===39){ nt=i; break } }
+    var xd=chX(nt)-((W-2*PAD)/AR.chaps.length)/2;
+    c.strokeStyle=t.mut; c.globalAlpha=.55; c.lineWidth=1;
+    c.beginPath(); c.moveTo(xd,BASEY-2); c.lineTo(xd,BASEY+BARH+4); c.stroke();
+    c.globalAlpha=1; c.fillStyle=t.mut;
+    c.font='500 9.5px "IBM Plex Sans",system-ui,sans-serif';
+    var marks=[[0,'Genesis','l'],[17,'Job','c'],[22,'Isaiah','c'],[39,'Matthew','c'],[65,'Revelation','r']];
+    var seenb={};
+    for(i=0;i<AR.chaps.length;i++){ if(!(AR.chaps[i][0] in seenb)) seenb[AR.chaps[i][0]]=i }
+    for(var k2=0;k2<marks.length;k2++){
+      var bi2=marks[k2][0], xx=chX(seenb[bi2]), al=marks[k2][2];
+      c.textAlign = al==='l'?'left':(al==='r'?'right':'center');
+      c.fillText(marks[k2][1], al==='l'?PAD:(al==='r'?W-PAD:xx), BASEY+BARH+13);
+      if(al==='c'){ c.globalAlpha=.4; c.strokeStyle=t.mut; c.beginPath();
+        c.moveTo(xx,BASEY+BARH+1); c.lineTo(xx,BASEY+BARH+4); c.stroke(); c.globalAlpha=1; }
+    }
+    c.textAlign='left';
+  }
+  function resizeArc(){
+    if(!AR||!cv) return;
+    var wrap=cv.parentNode, cssW=wrap.clientWidth;
+    if(!cssW) return;
+    var cssH=Math.max(320, Math.min(480, Math.round(cssW*0.40)));
+    DPR=Math.min(window.devicePixelRatio||1, 2);
+    W=cssW; H=cssH; BASEY=H-BARH-LABH-8;
+    cv.width=Math.round(W*DPR); cv.height=Math.round(H*DPR);
+    cv.style.height=cssH+'px';
+    base=document.createElement('canvas'); base.width=cv.width; base.height=cv.height;
+    cx2=cv.getContext('2d'); cx2.setTransform(DPR,0,0,DPR,0,0);
+    renderArcs();
+  }
+  function renderArcs(){
+    if(drawing) return;
+    var bc=base.getContext('2d'); bc.setTransform(DPR,0,0,DPR,0,0);
+    bc.clearRect(0,0,W,H);
+    var t=tokens(), lmax=Math.log(1+AR.max), n=AR.a.length;
+    drawing=true;
+    var order=[]; for(var k=n-1;k>=0;k--) if(keep(k)) order.push(k);
+    var pos=0, CH=9000;
+    function step(){
+      var end=Math.min(pos+CH, order.length);
+      for(;pos<end;pos++){
+        var e=order[pos], w=AR.w[e], r=Math.log(1+w)/lmax;
+        arcPath(bc, e, 0.30+0.55*r, 0.009+0.125*Math.pow(r,1.7), isX(e)?t.x:t.inn);
+      }
+      $('prog').style.width=Math.round(100*pos/order.length)+'%';
+      if(pos<order.length){ requestAnimationFrame(step); }
+      else { drawing=false; $('prog').style.width='0%'; drawBars(bc); paintArc(); }
+    }
+    requestAnimationFrame(step);
+  }
+  function paintArc(){
+    if(!cx2) return;
+    cx2.setTransform(1,0,0,1,0,0); cx2.clearRect(0,0,cv.width,cv.height);
+    cx2.drawImage(base,0,0); cx2.setTransform(DPR,0,0,DPR,0,0);
+    if(hoverCh<0 || !ADJ[hoverCh]) return;
+    var t=tokens(), list=ADJ[hoverCh], lmax=Math.log(1+AR.max);
+    cx2.globalAlpha=1; cx2.fillStyle=t.rule;
+    cx2.fillRect(chX(hoverCh)-0.5, 0, 1, BASEY);
+    for(var i=0;i<list.length;i++){
+      var e=list[i]; if(!keep(e)) continue;
+      var r=Math.log(1+AR.w[e])/lmax;
+      arcPath(cx2, e, 0.8+1.6*r, 0.5+0.45*r, isX(e)?t.x:t.inn);
+    }
+    cx2.globalAlpha=1;
+  }
+  function chAt(p){
+    var i=Math.round((p-PAD)/(W-2*PAD)*AR.chaps.length - 0.5);
+    return (i<0||i>=AR.chaps.length)?-1:i;
+  }
+  function bindArc(){
+    cv.addEventListener('mousemove',function(e){
+      var r=cv.getBoundingClientRect(), i=chAt(e.clientX-r.left);
+      if(i===hoverCh) return;
+      hoverCh=i; paintArc();
+      var tip=$('tip');
+      if(i<0){ tip.classList.remove('on'); return; }
+      var deg=ADJ[i]?ADJ[i].filter(keep).length:0, tot=0;
+      if(ADJ[i]) for(var k=0;k<ADJ[i].length;k++) if(keep(ADJ[i][k])) tot+=AR.w[ADJ[i][k]];
+      tip.innerHTML='<b>'+BOOKS[AR.chaps[i][0]].n+' '+AR.chaps[i][1]+'</b>'+AR.chaps[i][2]
+        +' verses<br><i>'+nfm(deg)+' linked chapters &middot; weight '+nfm(tot)+'</i>';
+      tip.classList.add('on');
+      var tw=tip.offsetWidth, left=Math.min(Math.max(e.clientX-r.left+14, 6), r.width-tw-6);
+      tip.style.left=left+'px'; tip.style.top=Math.max(6,e.clientY-r.top-10)+'px';
+    });
+    cv.addEventListener('mouseleave',function(){ hoverCh=-1; paintArc(); $('tip').classList.remove('on') });
+    cv.addEventListener('click',function(e){
+      var r=cv.getBoundingClientRect(), i=chAt(e.clientX-r.left);
+      if(i<0) return;
+      go(AR.chaps[i][0], AR.chaps[i][1], null, false);
+    });
+    $('filtseg').addEventListener('click',function(e){
+      var b=e.target.closest('button'); if(!b||drawing) return;
+      arcFilt=b.dataset.f;
+      var bs=this.querySelectorAll('button');
+      for(var i=0;i<bs.length;i++) bs[i].setAttribute('aria-pressed', bs[i]===b?'true':'false');
+      renderArcs();
+    });
+    window.addEventListener('resize',function(){ clearTimeout(window.__rt); window.__rt=setTimeout(function(){ if(view==='web') resizeArc() },220) });
+  }
+  function loadArcs(){
+    if(AR) { setTimeout(resizeArc,30); return; }
+    jget('data/arcs.json').then(function(d){
+      AR=d; cv=$('arc');
+      ADJ=new Array(d.chaps.length);
+      for(var i=0;i<d.a.length;i++){
+        (ADJ[d.a[i]]||(ADJ[d.a[i]]=[])).push(i);
+        (ADJ[d.b[i]]||(ADJ[d.b[i]]=[])).push(i);
+      }
+      var ws=d.w.slice().sort(function(a,b){return b-a});
+      strongCut=ws[Math.floor(ws.length*0.10)]||1;
+      $('n1').textContent=nfm(d.chaps.length);
+      $('n2').textContent=nfm(d.a.length);
+      var xc=0; for(var k=0;k<d.a.length;k++) if(isX(k)) xc++;
+      $('n3').textContent=(100*xc/d.a.length).toFixed(1)+'%';
+      $('n4').textContent=nfm(IDX.totalEdges);
+      bindArc(); setTimeout(resizeArc,30);
+    });
+  }
+
+  /* ================= places, bubble, atlas ================= */
+  var MV={lon:35.2,lat:31.8,k:34}, mc=null, mctx=null, MW=0,MH=0,MDPR=1,
+      showK=true, showN=true, showP=true, dragging=null, JRN=null, curJ=-1, curStop=-1;
+  var LBL=[];
+
+  function mercY(lat){ lat=Math.max(-84,Math.min(84,lat)); return 180/Math.PI*Math.log(Math.tan(Math.PI/4+lat*Math.PI/360)) }
+  function px(lon,lat){ return [MW/2+(lon-MV.lon)*MV.k, MH/2-(mercY(lat)-mercY(MV.lat))*MV.k] }
+  function inRing(lon,lat,r){
+    var ins=false;
+    for(var i=0,j=r.length-1;i<r.length;j=i++){
+      var xi=r[i][0],yi=r[i][1],xj=r[j][0],yj=r[j][1];
+      if(((yi>lat)!==(yj>lat)) && (lon < (xj-xi)*(lat-yi)/((yj-yi)||1e-12)+xi)) ins=!ins;
+    }
+    return ins;
+  }
+  function countryAt(lon,lat){
+    if(!BASE) return null;
+    for(var i=0;i<BASE.length;i++) for(var j=0;j<BASE[i].r.length;j++)
+      if(inRing(lon,lat,BASE[i].r[j])) return BASE[i].n;
+    return null;
+  }
+  function centroid(poly){
+    var x=0,y=0; for(var i=0;i<poly.length;i++){x+=poly[i][0];y+=poly[i][1]}
+    return [x/poly.length, y/poly.length];
+  }
+  function geoReady(){
+    if(BASE && KING) return Promise.resolve();
+    return Promise.all([
+      BASE?Promise.resolve(BASE):jget('data/geo/base.json').then(function(d){BASE=d}),
+      KING?Promise.resolve(KING):jget('data/geo/kingdoms.json').then(function(d){KING=d})
+    ]);
+  }
+  function lblFree(c,text,x,y,align,font){
+    c.font=font; var w=c.measureText(text).width;
+    var x0=(align==='center')?x-w/2:x;
+    var r=[x0-3,y-10,x0+w+3,y+4];
+    for(var i=0;i<LBL.length;i++){ var o=LBL[i];
+      if(!(r[2]<o[0]||r[0]>o[2]||r[3]<o[1]||r[1]>o[3])) return null; }
+    LBL.push(r); return x0;
+  }
+  function placeLine(p){
+    var t=p.t.charAt(0).toUpperCase()+p.t.slice(1);
+    return t + (p.nc>1 ? ' \u00B7 '+p.nc+' proposed sites' : '');
+  }
+
+  /* ---- bubble ---- */
+  function openBubble(el, pid){
+    var p=PL[pid]; if(!p) return;
+    curPlace=pid;
+    var cn=null;
+    var fin=function(){
+      var b=$('bub');
+      b.innerHTML='<h4>'+(p.art?p.art+' ':'')+esc(p.n)+'</h4><div class="ty">'+esc(placeLine(p))+'</div>'
+        +'<dl>'+(p.mn?'<dt>Site today</dt><dd>'+esc(p.mn)+'</dd>':'')
+        +(cn?'<dt>Country</dt><dd>'+esc(cn)+'</dd>':'')
+        +'<dt>Coordinates</dt><dd>'+p.c[1].toFixed(3)+', '+p.c[0].toFixed(3)+'</dd>'
+        +'<dt>In scripture</dt><dd>'+nfm(p.v)+' verse'+(p.v===1?'':'s')+'</dd></dl>'
+        +'<div class="row"><button class="go" id="bgo">Open map</button><button id="bcl">Close</button></div>';
+      b.hidden=false;
+      var r=el.getBoundingClientRect(), bw=b.offsetWidth, bh=b.offsetHeight;
+      var left=Math.min(Math.max(r.left+r.width/2-bw/2, 8), window.innerWidth-bw-8);
+      var top=r.top-bh-10, below=false;
+      if(top<8){ top=r.bottom+10; below=true; }
+      b.classList.toggle('below', below);
+      b.style.left=left+'px'; b.style.top=top+'px';
+      b.style.setProperty('--ax', Math.round(Math.min(Math.max(r.left+r.width/2-left-6,10), bw-22))+'px');
+      $('bgo').onclick=function(){
+        closeBubble();
+        retView={b:cur.b,c:cur.c,v:cur.v};
+        setView('atlas',{place:pid});
+      };
+      $('bcl').onclick=closeBubble;
+    };
+    geoReady().then(function(){ cn=countryAt(p.c[0],p.c[1]); fin() });
+    fin();
+  }
+  function closeBubble(){
+    $('bub').hidden=true;
+    var o=document.querySelectorAll('.pl.on');
+    for(var i=0;i<o.length;i++) o[i].classList.remove('on');
+  }
+
+  /* ---- atlas ---- */
+  function fitTo(p){
+    if(p.poly && p.poly.length>2){
+      var xs=p.poly.map(function(q){return q[0]}), ys=p.poly.map(function(q){return q[1]});
+      var x0=Math.min.apply(null,xs), x1=Math.max.apply(null,xs);
+      var w=x1-x0, h=mercY(Math.max.apply(null,ys))-mercY(Math.min.apply(null,ys));
+      MV.lon=(x1+x0)/2;
+      MV.lat=(Math.max.apply(null,ys)+Math.min.apply(null,ys))/2;
+      MV.k=Math.max(6, Math.min(140, 0.78*Math.min(MW/Math.max(w,.2), MH/Math.max(h,.2))));
+    } else {
+      MV.lon=p.c[0]; MV.lat=p.c[1];
+      var span = (p.t==='region') ? 20 : (p.t==='settlement' ? 8 : 12);
+      MV.k = Math.max(4, Math.min(170, MW/span));
+    }
+  }
+  function openAtlasView(opts){
+    geoReady().then(function(){
+      mc=$('mapc'); sizeMap(); loadJourneys();
+      $('atback').hidden = !retView;
+      if(retView) $('atback').textContent='\u2190 Back to '+BOOKS[retView.b].n+' '+retView.c;
+      if(opts.place){
+        curPlace=opts.place; curJ=-1; curStop=-1; $('jsel').value=''; drawStops();
+        var p=PL[curPlace];
+        $('atname').textContent=(p.art?p.art+' ':'')+p.n;
+        var cn=countryAt(p.c[0],p.c[1]);
+        $('atsub').innerHTML=esc(placeLine(p))
+          +(p.mn?' &middot; today <b>'+esc(p.mn)+'</b>':'')
+          +(cn?', '+esc(cn):'')
+          +' &middot; '+nfm(p.v)+' verse'+(p.v===1?'':'s');
+        fitTo(p);
+      } else if(opts.journey!==undefined){
+        loadJourneys().then(function(){ $('jsel').value=String(opts.journey); setJourney(opts.journey) });
+        return;
+      } else if(curJ<0 && !curPlace){
+        loadJourneys().then(function(){ $('jsel').value='0'; setJourney(0) });
+        return;
+      }
+      drawMap();
+    });
+  }
+  $('atback').addEventListener('click',function(){
+    var r=retView; retView=null; $('atback').hidden=true;
+    setView('read'); if(r) go(r.b,r.c,r.v||1,false);
+  });
+  function sizeMap(){
+    if(!mc) return;
+    var w=mc.parentNode.clientWidth, h=mc.parentNode.clientHeight;
+    if(!w||!h) return;
+    MDPR=Math.min(window.devicePixelRatio||1,2);
+    MW=w; MH=h; mc.width=Math.round(w*MDPR); mc.height=Math.round(h*MDPR);
+    mctx=mc.getContext('2d');
+  }
+  function drawMap(){
+    if(!mctx||!BASE) return;
+    var cs=getComputedStyle(document.documentElement);
+    var sea=cs.getPropertyValue('--sea').trim(), land=cs.getPropertyValue('--land').trim(),
+        coast=cs.getPropertyValue('--coast').trim(), rub=cs.getPropertyValue('--rubric').trim(),
+        acc=cs.getPropertyValue('--accent-2').trim(), mut=cs.getPropertyValue('--muted').trim(),
+        ink=cs.getPropertyValue('--ink-2').trim();
+    var c=mctx; c.setTransform(MDPR,0,0,MDPR,0,0);
+    c.fillStyle=sea; c.fillRect(0,0,MW,MH);
+    c.lineJoin='round';
+    for(var i=0;i<BASE.length;i++) for(var j=0;j<BASE[i].r.length;j++){
+      var r=BASE[i].r[j]; c.beginPath();
+      for(var q=0;q<r.length;q++){ var pt=px(r[q][0],r[q][1]); q?c.lineTo(pt[0],pt[1]):c.moveTo(pt[0],pt[1]) }
+      c.closePath(); c.fillStyle=land; c.fill();
+      if(showN){ c.strokeStyle=coast; c.lineWidth=0.8; c.stroke() }
+    }
+    var me=PL?PL[curPlace]:null;
+    LBL.length=0;
+    var meXY=null;
+    if(me){
+      meXY=px(me.c[0],me.c[1]);
+      lblFree(c,(me.art?me.art+' ':'')+me.n, meXY[0]+12.5, meXY[1]+3.5, 'left', '600 13px "EB Garamond",Georgia,serif');
+    }
+    if(showK && KING){
+      var KF='600 10.5px "IBM Plex Sans",system-ui,sans-serif';
+      var own=-1, ownA=1e9;
+      if(me) for(var w0=0;w0<KING.length;w0++){
+        if(!inRing(me.c[0],me.c[1],KING[w0].poly)) continue;
+        var ar=0, P0=KING[w0].poly;
+        for(var w1=0,w2=P0.length-1;w1<P0.length;w2=w1++) ar+=(P0[w2][0]+P0[w1][0])*(P0[w2][1]-P0[w1][1]);
+        ar=Math.abs(ar/2);
+        if(ar<ownA){ ownA=ar; own=w0; }
+      }
+      for(var k2=0;k2<KING.length;k2++){
+        var K=KING[k2], here=(k2===own);
+        c.beginPath();
+        for(var z=0;z<K.poly.length;z++){ var p2=px(K.poly[z][0],K.poly[z][1]); z?c.lineTo(p2[0],p2[1]):c.moveTo(p2[0],p2[1]) }
+        c.closePath();
+        if(here){ c.fillStyle='rgba(163,37,32,.11)'; c.fill(); }
+        c.setLineDash(here?[]:[4,5]);
+        c.strokeStyle=rub; c.lineWidth=here?1.6:0.9; c.globalAlpha=here?.9:.30; c.stroke(); c.globalAlpha=1;
+        c.setLineDash([]);
+        var ct=centroid(K.poly), cp=px(ct[0],ct[1]);
+        if(cp[0]>40&&cp[0]<MW-40&&cp[1]>14&&cp[1]<MH-14){
+          var kx=lblFree(c,K.n,cp[0],cp[1],'center',KF);
+          if(kx!==null){ c.font=KF; c.textAlign='left'; c.fillStyle=rub;
+            c.globalAlpha=here?1:.62; c.fillText(K.n,kx+3,cp[1]); c.globalAlpha=1; }
+        }
+      }
+    }
+    if(me && me.poly){
+      c.beginPath();
+      for(var y=0;y<me.poly.length;y++){ var p3=px(me.poly[y][0],me.poly[y][1]); y?c.lineTo(p3[0],p3[1]):c.moveTo(p3[0],p3[1]) }
+      c.closePath(); c.fillStyle='rgba(46,74,92,.22)'; c.fill();
+      c.strokeStyle=acc; c.lineWidth=1.6; c.stroke();
+    }
+    drawJourney(c, acc, sea);
+    if(showP && PL && curJ<0){
+      var span=MW/MV.k, lo=MV.lon-span/2, hi=MV.lon+span/2, vis=[];
+      var minV = MV.k>=70 ? 0 : (MV.k>=40 ? 3 : (MV.k>=22 ? 8 : 20));
+      for(var id in PL){
+        if(id===curPlace) continue;
+        var q2=PL[id]; if(q2.v<minV) continue;
+        if(q2.c[0]<lo||q2.c[0]>hi) continue;
+        var pp=px(q2.c[0],q2.c[1]);
+        if(pp[1]<8||pp[1]>MH-8||pp[0]<8||pp[0]>MW-8) continue;
+        vis.push([q2,pp]);
+      }
+      c.globalAlpha=.5; c.fillStyle=mut;
+      for(var d=0;d<vis.length;d++){ c.beginPath(); c.arc(vis[d][1][0],vis[d][1][1],MV.k>=70?2.1:1.6,0,6.284); c.fill() }
+      c.globalAlpha=1;
+      vis.sort(function(x,y){return y[0].v-x[0].v});
+      var PF='400 9.5px "IBM Plex Sans",system-ui,sans-serif', shown=0;
+      c.textAlign='left';
+      for(var d2=0;d2<vis.length && shown<60;d2++){
+        var q3=vis[d2][0], pp3=vis[d2][1];
+        if(q3.v<2) break;
+        var lx=lblFree(c,q3.n,pp3[0]+5,pp3[1]+3,'left',PF);
+        if(lx===null) continue;
+        c.font=PF; c.fillStyle=ink; c.globalAlpha=.8; c.fillText(q3.n,lx+3,pp3[1]+3); c.globalAlpha=1; shown++;
+      }
+    }
+    if(me){
+      var m=meXY||px(me.c[0],me.c[1]);
+      c.beginPath(); c.arc(m[0],m[1],6.5,0,6.284); c.fillStyle=rub; c.fill();
+      c.strokeStyle=sea; c.lineWidth=2; c.stroke();
+      c.font='600 13px "EB Garamond",Georgia,serif'; c.textAlign='left';
+      var lab=(me.art?me.art+' ':'')+me.n;
+      var tw=c.measureText(lab).width;
+      c.fillStyle=sea; c.globalAlpha=.82; c.fillRect(m[0]+9, m[1]-9, tw+7, 17); c.globalAlpha=1;
+      c.fillStyle=rub; c.fillText(lab, m[0]+12.5, m[1]+3.5);
+    }
+  }
+  function loadJourneys(){
+    if(JRN) return Promise.resolve(JRN);
+    return jget('data/geo/journeys.json').then(function(d){
+      JRN=d;
+      var sel=$('jsel'), h='<option value="">None</option>';
+      for(var i=0;i<d.length;i++) h+='<option value="'+i+'">'+d[i].n+'</option>';
+      sel.innerHTML=h;
+      $('f4').textContent=d.length;
+      return d;
+    });
+  }
+  function fitJourney(j){
+    var xs=j.w.map(function(w){return w.c[0]}), ys=j.w.map(function(w){return w.c[1]});
+    var x0=Math.min.apply(null,xs), x1=Math.max.apply(null,xs);
+    var y0=mercY(Math.min.apply(null,ys)), y1=mercY(Math.max.apply(null,ys));
+    MV.lon=(x0+x1)/2;
+    MV.lat=360/Math.PI*Math.atan(Math.exp(((y0+y1)/2)*Math.PI/180))-90;
+    MV.k=Math.max(4, Math.min(150, 0.80*Math.min(MW/Math.max(x1-x0,.4), MH/Math.max(y1-y0,.4))));
+  }
+  function drawStops(){
+    var box=$('atstops');
+    if(curJ<0||!JRN){ box.hidden=true; box.innerHTML=''; return; }
+    var j=JRN[curJ], h='';
+    for(var i=0;i<j.w.length;i++){
+      if(i) h+='<span class="stp-sep">\u2192</span>';
+      h+='<button class="stp'+(i===curStop?' now':'')+'" data-i="'+i+'"><b>'+(i+1)+'</b>'
+        +esc(j.w[i].n)+' <i>'+esc(j.w[i].r)+'</i></button>';
+    }
+    box.innerHTML=h; box.hidden=false;
+  }
+  function setJourney(i){
+    curJ=i; curStop=-1;
+    if(i<0){ drawStops(); drawMap(); return; }
+    curPlace=null;
+    var j=JRN[i];
+    $('atname').textContent=j.n;
+    $('atsub').innerHTML=esc(j.s)+' &middot; <b>'+j.w.length+'</b> stops &middot; '+esc(j.note);
+    fitJourney(j); drawStops(); drawMap();
+  }
+  function drawJourney(c,acc,sea){
+    if(curJ<0||!JRN) return;
+    var j=JRN[curJ], pts=j.w.map(function(w){return px(w.c[0],w.c[1])}), i;
+    c.save();
+    c.lineJoin='round'; c.lineCap='round';
+    c.strokeStyle=sea; c.lineWidth=5.5; c.globalAlpha=.75;
+    c.beginPath(); for(i=0;i<pts.length;i++) i?c.lineTo(pts[i][0],pts[i][1]):c.moveTo(pts[i][0],pts[i][1]); c.stroke();
+    c.strokeStyle=acc; c.lineWidth=2.2; c.globalAlpha=.95;
+    c.beginPath(); for(i=0;i<pts.length;i++) i?c.lineTo(pts[i][0],pts[i][1]):c.moveTo(pts[i][0],pts[i][1]); c.stroke();
+    c.globalAlpha=1;
+    var NF='600 9px "IBM Plex Sans",system-ui,sans-serif';
+    for(var k=0;k<pts.length;k++){
+      var on=(k===curStop), rr=on?9:6.5;
+      c.beginPath(); c.arc(pts[k][0],pts[k][1],rr,0,6.284);
+      c.fillStyle=on?'#A32520':acc; c.fill();
+      c.strokeStyle=sea; c.lineWidth=1.6; c.stroke();
+      c.font=NF; c.textAlign='center'; c.fillStyle=sea;
+      c.fillText(String(k+1), pts[k][0], pts[k][1]+3.2);
+    }
+    c.textAlign='left';
+    var SF='600 11px "EB Garamond",Georgia,serif';
+    for(var m=0;m<pts.length;m++){
+      var lx=lblFree(c,j.w[m].n,pts[m][0]+10,pts[m][1]-7,'left',SF);
+      if(lx===null) continue;
+      c.font=SF; c.fillStyle=sea; c.globalAlpha=.8;
+      c.fillRect(lx, pts[m][1]-17, c.measureText(j.w[m].n).width+6, 14); c.globalAlpha=1;
+      c.fillStyle=acc; c.fillText(j.w[m].n, lx+3, pts[m][1]-7);
+    }
+    c.restore();
+  }
+  function zoomBy(f){ MV.k=Math.max(2.2, Math.min(260, MV.k*f)); drawMap() }
+
+  function bindAtlas(){
+    $('jsel').addEventListener('change',function(){ setJourney(this.value===''?-1:+this.value) });
+    $('atstops').addEventListener('click',function(e){
+      var b=e.target.closest('.stp'); if(!b||curJ<0) return;
+      curStop=+b.dataset.i;
+      var w=JRN[curJ].w[curStop];
+      MV.lon=w.c[0]; MV.lat=w.c[1]; MV.k=Math.max(MV.k, 26);
+      drawStops(); drawMap();
+      b.scrollIntoView({block:'nearest',inline:'center'});
+    });
+    $('zin').addEventListener('click',function(){zoomBy(1.45)});
+    $('zout').addEventListener('click',function(){zoomBy(1/1.45)});
+    $('zfit').addEventListener('click',function(){
+      if(curJ>=0){ fitJourney(JRN[curJ]); drawMap(); return }
+      if(PL&&PL[curPlace]){ fitTo(PL[curPlace]); drawMap() }
+    });
+    [['tgK','K'],['tgN','N'],['tgP','P']].forEach(function(pair){
+      $(pair[0]).addEventListener('click',function(){
+        if(pair[1]==='K') showK=!showK; else if(pair[1]==='N') showN=!showN; else showP=!showP;
+        var v=(pair[1]==='K')?showK:(pair[1]==='N'?showN:showP);
+        this.setAttribute('aria-pressed', v?'true':'false'); drawMap();
+      });
+    });
+    var mcv=$('mapc');
+    mcv.addEventListener('pointerdown',function(e){ dragging={x:e.clientX,y:e.clientY}; this.classList.add('drag'); this.setPointerCapture(e.pointerId) });
+    mcv.addEventListener('pointermove',function(e){
+      if(!dragging) return;
+      var dx=e.clientX-dragging.x, dy=e.clientY-dragging.y;
+      dragging={x:e.clientX,y:e.clientY};
+      MV.lon-=dx/MV.k;
+      var my=mercY(MV.lat)+dy/MV.k;
+      MV.lat=Math.max(-82,Math.min(82, 360/Math.PI*Math.atan(Math.exp(my*Math.PI/180))-90));
+      drawMap();
+    });
+    ['pointerup','pointercancel','pointerleave'].forEach(function(ev){
+      mcv.addEventListener(ev,function(){ dragging=null; this.classList.remove('drag') });
+    });
+    mcv.addEventListener('wheel',function(e){ e.preventDefault(); zoomBy(e.deltaY<0?1.12:1/1.12) },{passive:false});
+    window.addEventListener('resize',function(){ if(view==='atlas'){ sizeMap(); drawMap() } });
+  }
+
+  /* ================= places view ================= */
+  var pvInit=false, pvType='', pvShown=60, pvList=[];
+  function initPlaces(){
+    if(!PL) return;
+    if(!pvInit){
+      pvInit=true;
+      $('pq').addEventListener('input',function(){ pvShown=60; renderPlaces() });
+      $('ptype').addEventListener('click',function(e){
+        var b=e.target.closest('button'); if(!b) return;
+        pvType=b.dataset.t; pvShown=60;
+        var bs=this.querySelectorAll('button');
+        for(var i=0;i<bs.length;i++) bs[i].setAttribute('aria-pressed', bs[i]===b?'true':'false');
+        renderPlaces();
+      });
+      $('pmore').addEventListener('click',function(){ pvShown+=90; renderPlaces() });
+      $('pgrid').addEventListener('click',function(e){
+        var card=e.target.closest('.pcard'); if(!card) return;
+        retView=null; setView('atlas',{place:card.dataset.p});
+      });
+    }
+    renderPlaces();
+  }
+  var WATER={'body of water':1,'river':1,'spring':1,'pool':1,'wadi':1,'island':1};
+  var TERRAIN={'mountain':1,'mountain range':1,'hill':1,'valley':1,'natural area':1,'tree':1};
+  function typeOf(t){
+    if(t==='settlement') return 'settlement';
+    if(t==='region') return 'region';
+    if(WATER[t]) return 'water';
+    if(TERRAIN[t]) return 'terrain';
+    return 'other';
+  }
+  function renderPlaces(){
+    var q=$('pq').value.trim().toLowerCase();
+    pvList=[];
+    for(var id in PL){
+      var p=PL[id];
+      if(pvType && typeOf(p.t)!==pvType) continue;
+      if(q && p.n.toLowerCase().indexOf(q)<0 && !(p.mn&&p.mn.toLowerCase().indexOf(q)>=0)) continue;
+      pvList.push(p);
+    }
+    pvList.sort(function(a,b){ return b.v-a.v || a.n.localeCompare(b.n) });
+    $('pcount').textContent=nfm(pvList.length)+' place'+(pvList.length===1?'':'s');
+    var h='';
+    for(var i=0;i<Math.min(pvShown,pvList.length);i++){
+      var p=pvList[i];
+      h+='<button class="pcard" data-p="'+p.id+'">'
+        +'<div class="pn">'+esc((p.art?p.art+' ':'')+p.n)+'</div>'
+        +'<div class="pt">'+esc(p.t)+'</div>'
+        +(p.mn?'<div class="pm">'+esc(p.mn)+'</div>':'')
+        +'<div class="pv2">'+nfm(p.v)+' verse'+(p.v===1?'':'s')+'</div></button>';
+    }
+    $('pgrid').innerHTML = h || '<div class="empty">No places match that search.</div>';
+    $('pmore').hidden = pvShown>=pvList.length;
+  }
+
+  /* ================= command palette ================= */
+  var palSel=0, palItems=[];
+  function openPal(){
+    $('palscrim').hidden=false; $('palq').value=''; palSel=0;
+    palRender(''); setTimeout(function(){$('palq').focus()},20);
+  }
+  function closePal(){ $('palscrim').hidden=true }
+  function palRender(q){
+    q=q.trim();
+    palItems=[];
+    var m=q.match(/^(\d?\s*[A-Za-z][A-Za-z ]*?)\s*(\d+)?\s*(?::\s*(\d+))?$/);
+    var ql=q.toLowerCase();
+    if(ql){
+      // books
+      for(var i=0;i<BOOKS.length;i++){
+        var bn=BOOKS[i].n.toLowerCase();
+        if(bn.indexOf(ql)===0 || bn.replace(/\s/g,'').indexOf(ql.replace(/\s/g,''))===0)
+          palItems.push({k:'Book',n:BOOKS[i].n,d:BOOKS[i].c.length+' chapters',go:{b:i,c:1}});
+      }
+      if(m && m[2]){
+        var want=m[1].trim().toLowerCase();
+        for(var j=0;j<BOOKS.length;j++){
+          var nb=BOOKS[j].n.toLowerCase();
+          if(nb.indexOf(want)===0||nb.replace(/\s/g,'').indexOf(want.replace(/\s/g,''))===0){
+            var ch=Math.min(+m[2], BOOKS[j].c.length);
+            var vs=m[3]?Math.min(+m[3], BOOKS[j].c[ch-1]):null;
+            palItems.unshift({k:'Passage',n:BOOKS[j].n+' '+ch+(vs?':'+vs:''),
+              d:vs?'open verse':'open chapter', go:{b:j,c:ch,v:vs}});
+            break;
+          }
+        }
+      }
+      // places
+      if(PL){
+        var hits=[];
+        for(var id in PL){
+          var p=PL[id], pn=p.n.toLowerCase();
+          var at=pn.indexOf(ql);
+          if(at<0) continue;
+          hits.push([at===0?0:1, -p.v, p]);
+        }
+        hits.sort(function(a,b){return a[0]-b[0] || a[1]-b[1]});
+        for(var h2=0;h2<Math.min(hits.length,8);h2++){
+          var pp=hits[h2][2];
+          palItems.push({k:'Place',n:(pp.art?pp.art+' ':'')+pp.n,
+            d:(pp.mn?pp.mn+' \u00B7 ':'')+nfm(pp.v)+' verses', place:pp.id});
+        }
+      }
+      // journeys
+      if(JRN) for(var jj=0;jj<JRN.length;jj++){
+        if(JRN[jj].n.toLowerCase().indexOf(ql)>=0 || JRN[jj].s.toLowerCase().indexOf(ql)>=0)
+          palItems.push({k:'Journey',n:JRN[jj].n,d:JRN[jj].w.length+' stops',journey:jj});
+      }
+    } else {
+      palItems=[
+        {k:'View',n:'The reader',d:'66 books',view:'read'},
+        {k:'View',n:'The web of cross-references',d:'133,612 links',view:'web'},
+        {k:'View',n:'The atlas',d:'maps and journeys',view:'atlas'},
+        {k:'View',n:'Every place in scripture',d:'1,335 places',view:'places'}
+      ];
+    }
+    palItems=palItems.slice(0,24);
+    if(palSel>=palItems.length) palSel=0;
+    var out='';
+    for(var k=0;k<palItems.length;k++){
+      var it=palItems[k];
+      out+='<button class="pr'+(k===palSel?' sel':'')+'" data-i="'+k+'">'
+        +'<span class="pr-k">'+it.k+'</span><span class="pr-n">'+esc(it.n)+'</span>'
+        +'<span class="pr-d">'+esc(it.d||'')+'</span></button>';
+    }
+    $('palres').innerHTML = out || '<div class="empty">Nothing matches that.</div>';
+  }
+  function palGo(i){
+    var it=palItems[i]; if(!it) return;
+    closePal();
+    if(it.go){ setView('read'); go(it.go.b,it.go.c,it.go.v||null,!!it.go.v); }
+    else if(it.place){ retView=null; setView('atlas',{place:it.place}); }
+    else if(it.journey!==undefined){ retView=null; setView('atlas',{journey:it.journey}); }
+    else if(it.view){ setView(it.view); }
+  }
+  $('searchbtn').addEventListener('click',openPal);
+  $('palq').addEventListener('input',function(){ palSel=0; palRender(this.value) });
+  $('palres').addEventListener('click',function(e){
+    var b=e.target.closest('.pr'); if(b) palGo(+b.dataset.i);
+  });
+  $('palscrim').addEventListener('mousedown',function(e){ if(e.target===this) closePal() });
+  $('palq').addEventListener('keydown',function(e){
+    if(e.key==='ArrowDown'){ e.preventDefault(); palSel=Math.min(palSel+1,palItems.length-1); palRender(this.value); }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); palSel=Math.max(palSel-1,0); palRender(this.value); }
+    else if(e.key==='Enter'){ e.preventDefault(); palGo(palSel); }
+    else if(e.key==='Escape'){ closePal(); }
+  });
+
+  /* ---------- reader events ---------- */
+  $('body').addEventListener('click',function(e){
+    var pl=e.target.closest('.pl');
+    if(pl){ e.stopPropagation(); closeBubble(); pl.classList.add('on'); openBubble(pl, pl.dataset.p); return; }
+    var v=e.target.closest('.v.lk'); if(!v) return;
+    closeBubble(); select(cur.b,cur.c,+v.dataset.v,true);
+  });
+  $('body').addEventListener('keydown',function(e){
+    if(e.key!=='Enter'&&e.key!==' ') return;
+    var v=e.target.closest('.v.lk'); if(!v) return;
+    e.preventDefault(); select(cur.b,cur.c,+v.dataset.v,true);
+  });
+  $('read').addEventListener('scroll', closeBubble);
+  document.addEventListener('click',function(e){
+    if(!e.target.closest('.bub') && !e.target.closest('.pl')) closeBubble();
+  });
+  $('rlist').addEventListener('click',function(e){
+    var x=e.target.closest('.xr'); if(!x) return;
+    var l=locate(+x.dataset.g); go(l.b,l.c,l.v,true);
+  });
+  $('trail').addEventListener('click',function(e){
+    var c=e.target.closest('.chip'); if(!c) return;
+    var l=trail[+c.dataset.i]; trail=trail.slice(0,+c.dataset.i+1); drawTrail(); go(l.b,l.c,l.v,false);
+  });
+  $('prev').addEventListener('click',function(){
+    if(cur.c>1) go(cur.b,cur.c-1,null,false);
+    else if(cur.b>0) go(cur.b-1,BOOKS[cur.b-1].c.length,null,false);
+  });
+  $('next').addEventListener('click',function(){
+    if(cur.c<BOOKS[cur.b].c.length) go(cur.b,cur.c+1,null,false);
+    else if(cur.b<65) go(cur.b+1,1,null,false);
+  });
+  $('navbtn').addEventListener('click',function(e){ e.stopPropagation(); document.body.classList.toggle('navopen') });
+  $('rclose').addEventListener('click',function(){ $('refs').hidden=true });
+
+  document.addEventListener('keydown',function(e){
+    var typing = e.target.closest('input,textarea,select');
+    if((e.metaKey||e.ctrlKey) && e.key.toLowerCase()==='k'){ e.preventDefault(); openPal(); return; }
+    if(e.key==='Escape'){
+      if(!$('palscrim').hidden){ closePal(); return; }
+      closeBubble(); $('setpanel').hidden=true;
+      document.body.classList.remove('navopen');
+      if(window.innerWidth<=820) $('refs').hidden=true;
+      return;
+    }
+    if(typing) return;
+    if(e.key==='/'){ e.preventDefault(); openPal(); return; }
+    if(view!=='read') return;
+    if(e.key==='ArrowRight') $('next').click();
+    if(e.key==='ArrowLeft') $('prev').click();
+  });
+
+  /* ---------- boot ---------- */
+  applyPrefs();
+  $('body').innerHTML='<div class="skel" style="width:92%"></div><div class="skel" style="width:98%"></div>'
+    +'<div class="skel" style="width:86%"></div><div class="skel" style="width:94%"></div>';
+
+  jget('data/index.json').then(function(d){
+    IDX=d; BOOKS=d.books; TRS=d.trans||[{id:'bsb',short:'BSB',name:'Berean Standard Bible',note:''}];
+    var sv=LS.get('cw.tr',null);
+    if(sv){ for(var q=0;q<TRS.length;q++) if(TRS[q].id===sv) TR=sv; }
+    setStat(); buildRail(); bindAtlas();
+
+    jget('data/geo/places.json').then(function(g){
+      PL=g.places;
+      for(var id in PL) PL[id].id=id;
+      if(CACHE[cur.b]) render(CACHE[cur.b]);
+      if(view==='places') renderPlaces();
+      refreshHome();
+    });
+
+    var p=null; try{p=JSON.parse(LS.get('cw.pos','null'))}catch(e){}
+    var first = LS.get('cw.seen','')!=='1';
+    LS.set('cw.seen','1');
+    if(p&&typeof p.b==='number'&&p.b>=0&&p.b<66){ go(p.b,p.c,p.v||1,true); }
+    else { go(0,1,1,true); }
+    refreshHome();
+    setView(first ? 'home' : (LS.get('cw.view','read')));
+  }).catch(function(){
+    $('body').innerHTML='<div class="empty">Could not load the scripture files. '
+      +'Check your connection and reload.</div>';
+  });
+})();
+</script>

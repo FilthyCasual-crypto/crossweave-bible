@@ -1,0 +1,52 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sanity-check the data layer
+        run: |
+          python3 - <<'PY'
+          import json, sys, os
+          idx = json.load(open('app/data/index.json'))
+          assert len(idx['books']) == 66, 'expected 66 books'
+          assert idx['totalVerses'] == 31102, idx['totalVerses']
+          for tr in idx['trans']:
+              missing = [b for b in range(66) if not os.path.exists(f"app/data/{tr['id']}/{b}.json")]
+              assert not missing, f"{tr['id']} missing books {missing}"
+          for b in range(66):
+              assert os.path.exists(f'app/data/x/{b}.json'), f'missing cross-refs for book {b}'
+          for f in ('arcs.json','geo/base.json','geo/places.json','geo/kingdoms.json','geo/journeys.json'):
+              assert os.path.exists('app/data/'+f), 'missing '+f
+          html = open('app/index.html', encoding='utf-8').read()
+          bad = [c for c in html if ord(c) > 127]
+          assert not bad, f'index.html must stay pure ASCII, found {set(bad)}'
+          print(f"ok: 66 books, {idx['totalVerses']} verses, "
+                f"{idx['totalEdges']} cross-references, {len(idx['trans'])} translations")
+          PY
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./app
+      - id: deployment
+        uses: actions/deploy-pages@v4

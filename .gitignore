@@ -1,0 +1,16 @@
+# source datasets the build scripts consume - not vendored, see build/README.md
+/sources/
+*.jsonl
+ne_countries.geojson
+kjv.json
+cross_references.txt
+cross_references.zip
+bsb_*.txt
+bsb_*.xlsx
+
+# local
+.DS_Store
+__pycache__/
+*.pyc
+node_modules/
+.venv/
