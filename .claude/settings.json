@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(make:*)",
+      "Bash(python3 scripts/verify.py)",
+      "Bash(python3 build/*.py)",
+      "Bash(node scripts/check.mjs:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(ls:*)",
+      "Bash(du:*)",
+      "Bash(wc:*)",
+      "Bash(jq:*)"
+    ],
+    "ask": [
+      "Bash(git push:*)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(curl:*)"
+    ]
+  }
+}
