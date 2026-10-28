@@ -1,8 +1,9 @@
 # Regenerating the data
 
 The build scripts read source datasets this repo does not vendor (they are large, and two
-are CC BY — better fetched from the publisher than mirrored here). Put them in `sources/`
-and adjust the paths at the top of each script.
+are CC BY — better fetched from the publisher than mirrored here). `make sources` puts them in
+`sources/` and checks each against the sha256 in `data-baseline.json`. The scripts resolve
+paths from the repo root; set `CW_SOURCES` to read the datasets from somewhere else.
 
 ## Fetch the sources
 
@@ -36,7 +37,7 @@ curl -L -o ne_countries.geojson \
 ```bash
 python3 build/build.py       # verse text + cross-reference graph
 python3 build/arcs.py        # chapter-level arc aggregate (needs build.py output)
-python3 build/geo.py         # base map + gazetteer (writes /tmp/mentions.json for spans.py)
+python3 build/geo.py         # base map + gazetteer (writes .build-cache/mentions.json for spans.py)
 python3 build/spans.py       # place-name offsets per translation (needs geo.py)
 python3 build/kingdoms.py    # hand-drawn kingdom extents
 python3 build/journeys.py    # curated routes (needs spans.py)

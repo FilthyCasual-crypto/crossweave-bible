@@ -13,11 +13,21 @@ def check(cond, msg):
     return cond
 
 
+# Expectations live in data-baseline.json, NOT in index.json: the build writes index.json
+# itself, so checking the data against it can never catch upstream drift.
+BASE = json.load(open(os.path.join(ROOT, 'data-baseline.json')))
+T = BASE['totals']
+REBASE = "If upstream changed, re-baseline deliberately (see CLAUDE.md), do not edit this number to match."
+
 idx = json.load(open(os.path.join(APP, 'data/index.json')))
 books = idx['books']
 
-check(len(books) == 66, f"expected 66 books, found {len(books)}")
-check(idx['totalVerses'] == 31102, f"versification changed: {idx['totalVerses']} != 31102")
+check(len(books) == T['books'], f"expected {T['books']} books, found {len(books)}")
+check(idx['totalVerses'] == T['verses'], f"versification changed: {idx['totalVerses']} != {T['verses']}")
+check(len(idx['trans']) == T['translations'],
+      f"{len(idx['trans'])} translations, baseline expects {T['translations']}")
+check(sum(idx['linked']) == T['linked_verses'],
+      f"{sum(idx['linked'])} verses carry cross-references, baseline expects {T['linked_verses']}. " + REBASE)
 
 # book offsets must be contiguous and sum to the total
 run = 0
@@ -52,13 +62,22 @@ for bi, b in enumerate(books):
             check(len(e) == 3, f"book {bi} offset {off}: malformed edge {e}")
             check(0 <= e[0] < idx['totalVerses'], f"book {bi} offset {off}: target {e[0]} out of range")
             edges += 1
-check(edges == idx['totalEdges'], f"counted {edges} edges, index.json claims {idx['totalEdges']}")
+check(edges == T['edges'],
+      f"counted {edges} cross-references, baseline expects {T['edges']}. " + REBASE)
+# a different failure from drift: a partial build leaves index.json describing other data
+check(edges == idx['totalEdges'], f"index.json disagrees with the data it describes: "
+                                  f"counted {edges} edges, index.json claims {idx['totalEdges']}")
+
+arcs = json.load(open(os.path.join(APP, 'data/arcs.json')))
+check(len(arcs['a']) == T['chapter_links'],
+      f"{len(arcs['a'])} chapter links, baseline expects {T['chapter_links']}. " + REBASE)
 
 # geo layer
 for f in ('arcs.json', 'geo/base.json', 'geo/places.json', 'geo/kingdoms.json', 'geo/journeys.json'):
     check(os.path.exists(os.path.join(APP, 'data', f)), f"missing data/{f}")
 
 places = json.load(open(os.path.join(APP, 'data/geo/places.json')))['places']
+check(len(places) == T['places'], f"{len(places)} places, baseline expects {T['places']}. " + REBASE)
 for pid, pl in places.items():
     check(isinstance(pl.get('c'), list) and len(pl['c']) == 2, f"place {pid} has no coordinate pair")
     # these were once patched into the JSON instead of emitted by geo.py, so a rebuild
@@ -68,13 +87,15 @@ for pid, pl in places.items():
     check(pl.get('forms'), f"place {pid} ({pl.get('n')}) has no surface forms")
 
 kings = json.load(open(os.path.join(APP, 'data/geo/kingdoms.json')))
-check(len(kings) >= 13, f"only {len(kings)} kingdom extents; Moab was once lost this way")
+check(len(kings) == T['kingdoms'],
+      f"{len(kings)} kingdom extents, baseline expects {T['kingdoms']}; Moab was once lost this way")
 for k in kings:
     check(k.get('n') and k.get('p'), f"kingdom {k.get('id')} missing name or period")
     check(len(k.get('poly') or []) >= 4, f"kingdom {k.get('id')} polygon too small")
 
 # journey stops must point at real places
 jr = json.load(open(os.path.join(APP, 'data/geo/journeys.json')))
+check(len(jr) == T['journeys'], f"{len(jr)} journeys, baseline expects {T['journeys']}")
 for j in jr:
     for w in j['w']:
         check(w['p'] in places, f"journey {j['id']}: stop {w['p']} not in gazetteer")
@@ -110,5 +131,5 @@ if fails:
         print(f'  ... and {len(fails)-40} more')
     sys.exit(1)
 
-print(f"ok  66 books  {idx['totalVerses']:,} verses  {edges:,} cross-references  "
+print(f"ok  {len(books)} books  {idx['totalVerses']:,} verses  {edges:,} cross-references  "
       f"{len(places):,} places  {len(jr)} journeys  {len(idx['trans'])} translations  ASCII clean")

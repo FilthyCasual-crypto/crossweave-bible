@@ -15,14 +15,14 @@ make serve     # static server on :8000 (the app CANNOT run from file://)
 make verify    # data integrity + the ASCII rule - run before every commit
 make check     # render all five views headless, fail on any console/page error
 make shots     # write screenshots of every view to .shots/ for eyeballing
-make sources   # fetch the five upstream datasets into sources/ (not vendored)
-make data      # full data rebuild, in dependency order (needs sources/)
+make sources   # fetch the five upstream datasets into sources/, fail if they drifted
+make data      # full data rebuild, in dependency order (refuses to run on drifted sources)
 ```
 
 `make verify` is cheap and catches the mistakes that have actually shipped. Run it. It is the
 same thing as `python3 scripts/verify.py` — use whichever.
 
-`make check` runs 24 assertions across all five views and fails on any console or page
+`make check` runs 26 assertions across all five views and fails on any console or page
 error. Two env overrides: `CW_CHROMIUM=/path/to/chromium` to use a browser Playwright did
 not install, `CW_BASE=https://host/index.html` to check a deployed build instead of
 localhost.
@@ -110,7 +110,7 @@ home, read, web (arc diagram), atlas (map), places (gazetteer).
 into `{book, chapter, verse}` by binary search over book start offsets; `gidx(b,c,v)` goes
 the other way. Cross-references are `[targetIndex, span, weight]`.
 
-**Everything visual is canvas.** 133,612 arcs and a full vector map are far past the DOM.
+**Everything visual is canvas.** Well over 100,000 arcs and a full vector map are far past the DOM.
 The arc view draws once into an offscreen canvas in 9,000-arc chunks across animation frames,
 then composites that buffer plus the hovered subset. The map redraws wholesale on pan/zoom,
 which is fine at this geometry count.
@@ -138,8 +138,31 @@ build.py  ->  arcs.py
               kingdoms.py (independent)
 ```
 
-`geo.py` writes `/tmp/mentions.json`, which `spans.py` consumes. `journeys.py` reads the span
+`geo.py` writes `.build-cache/mentions.json`, which `spans.py` consumes. `journeys.py` reads the span
 files `spans.py` writes. Run them out of order and you get stale or empty output with no error.
+
+### Totals and source checksums live in `data-baseline.json`
+
+The sources are fetched from upstream, not vendored, and upstream republishes: openBible
+replaced `cross_references.txt` on 2026-10-26, and the file the original data was built
+from no longer exists anywhere. So the expected totals (edges, chapter links, linked verses,
+places, journeys, kingdoms) and the sha256 of every source file are checked in at the repo
+root. `verify.py` and `check.mjs` assert against that file, never against `index.json`,
+which the build writes itself. The verse count stays invariant 1; the edge count is **not**
+an invariant and is deliberately not written anywhere in this file.
+
+`make sources` fails when a download no longer matches its checksum, and `make data` refuses
+to run on drifted sources. That failure is not a build error, it is a decision:
+
+- **Re-baseline** (the default): `python3 scripts/check_sources.py --rebaseline` records the
+  new checksums and date, `make data` rebuilds, and `verify.py` then reports each total that
+  moved. In **one commit**, update the totals in `data-baseline.json`, the figures in
+  `README.md`, and the few literal counts in `app/index.html` (the home card meta and the
+  palette entry for The Web). Say in the commit message what upstream changed and by how
+  much.
+- **Never** edit a number in `data-baseline.json` just to make `verify.py` pass, and never
+  rebuild on drifted sources without re-baselining. Both hide the change instead of
+  recording it.
 
 ---
 

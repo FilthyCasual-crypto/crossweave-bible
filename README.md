@@ -8,8 +8,8 @@ cross-references.
 
 | | |
 |---|---|
-| Cross-references | 455,806 weighted verse-level links |
-| Chapter-to-chapter links | 133,612, of which 29.6% cross between the Testaments |
+| Cross-references | 455,832 weighted verse-level links |
+| Chapter-to-chapter links | 133,679, of which 29.6% cross between the Testaments |
 | Places mapped | 1,335, with modern site names and coordinates |
 | Journey routes | 7, each stop keyed to the verse that names it |
 | Translations | Berean Standard Bible, King James Version |
@@ -73,7 +73,7 @@ build/
 
 **Verse positions are global integers.** A verse is identified by its index in the canon
 (0 to 31,101). The cross-reference graph stores `[target, span, weight]` triples of
-integers, which is what keeps a 455,806-edge graph down to 5.6 MB. A book/chapter offset
+integers, which is what keeps a 455,832-edge graph down to 5.6 MB. A book/chapter offset
 table on the client turns any integer back into "John 3:16".
 
 **Text and references are separate layers.** `data/x/` is translation-independent. Adding a
@@ -87,7 +87,7 @@ actual text, and records character offsets. The renderer only wraps spans it was
 Match rate: 89.2% BSB, 94.4% KJV. The gap is places referred to by pronoun, which correctly
 produce no link rather than a wrong one.
 
-**Everything is drawn on canvas.** 133,612 arcs and a full vector map are far past what the
+**Everything is drawn on canvas.** 133,679 arcs and a full vector map are far past what the
 DOM handles. The arc view draws once into an offscreen buffer in 9,000-arc chunks across
 animation frames, then composites; hover redraws only the highlighted subset.
 

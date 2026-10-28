@@ -24,7 +24,7 @@ shots: ## same as check, plus 8 screenshots into .shots/
 dev-deps: ## install the only dev dependency (Playwright, for check/shots)
 	npm i -D playwright && npx playwright install chromium
 
-sources: ## fetch the five upstream datasets into sources/ (not vendored)
+sources: ## fetch the five upstream datasets into sources/ and check them against the baseline
 	@mkdir -p sources
 	@cd sources && \
 	  curl -sSLO https://a.openbible.info/data/cross-references.zip && unzip -oq cross-references.zip && \
@@ -34,9 +34,10 @@ sources: ## fetch the five upstream datasets into sources/ (not vendored)
 	    curl -sSL -o $$f.jsonl https://raw.githubusercontent.com/openbibleinfo/Bible-Geocoding-Data/main/data/$$f.jsonl; \
 	  done && \
 	  curl -sSL -o ne_countries.geojson https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_0_countries.geojson
-	@echo "sources/ ready"
+	@$(PY) scripts/check_sources.py
 
-data: ## full data rebuild, in dependency order (needs sources/)
+data: ## full data rebuild, in dependency order (needs sources/ matching the baseline)
+	@$(PY) scripts/check_sources.py
 	$(PY) build/build.py
 	$(PY) build/arcs.py
 	$(PY) build/geo.py

@@ -9,7 +9,11 @@
  * Needs a server on :8000 (make serve) and `npm i -D playwright`.
  */
 import { chromium } from 'playwright';
-import { mkdirSync } from 'fs';
+import { mkdirSync, readFileSync } from 'fs';
+
+// expected figures come from the checked-in baseline, never from index.json (see CLAUDE.md)
+const T = JSON.parse(readFileSync(new URL('../data-baseline.json', import.meta.url))).totals;
+const fmt = n => n.toLocaleString('en-US');
 
 const BASE = process.env.CW_BASE || 'http://localhost:8000/index.html';
 const SHOTS = process.argv.includes('--shots');
@@ -51,8 +55,8 @@ async function page(opts = {}) {
 {
   const p = await page();
   const figs = await p.$$eval('.fig b', e => e.map(x => x.textContent));
-  assert(figs[0] === '30,288', `home: verses-linked figure is "${figs[0]}", expected 30,288`);
-  assert(figs[1] === '455,806', `home: cross-reference figure is "${figs[1]}", expected 455,806`);
+  assert(figs[0] === fmt(T.linked_verses), `home: verses-linked figure is "${figs[0]}", expected ${fmt(T.linked_verses)}`);
+  assert(figs[1] === fmt(T.edges), `home: cross-reference figure is "${figs[1]}", expected ${fmt(T.edges)}`);
   assert(await p.isHidden('#trail'), 'home: the verse trail must not show outside the reader');
   if (SHOTS) await p.screenshot({ path: '.shots/home.png', fullPage: false });
   await p.close();
