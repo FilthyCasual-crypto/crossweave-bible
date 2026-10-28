@@ -14,9 +14,7 @@ __pycache__/
 *.pyc
 node_modules
 .venv/
+.shots/
 
 # build pipeline handoff between geo.py and spans.py
 /.build-cache/
-
-# Playwright writes this on install; pin the version in package.json instead
-package-lock.json

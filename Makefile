@@ -21,8 +21,9 @@ check: ## render every view headless, fail on console/page errors
 shots: ## same as check, plus 8 screenshots into .shots/
 	@node scripts/check.mjs --shots && echo "screenshots in .shots/"
 
-dev-deps: ## install the only dev dependency (Playwright, for check/shots)
-	npm i -D playwright && npx playwright install chromium
+dev-deps: ## install the only dev dependency (Playwright, pinned by package-lock.json)
+	npm ci && npx playwright install chromium
+#  to move the pin deliberately: npm i -D --save-exact playwright@<version>, commit both files
 
 sources: ## fetch the five upstream datasets into sources/ and check them against the baseline
 	@mkdir -p sources
