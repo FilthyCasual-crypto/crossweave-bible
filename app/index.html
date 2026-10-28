@@ -1180,7 +1180,7 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
   /* ================= places, bubble, atlas ================= */
   var MV={lon:35.2,lat:31.8,k:34}, mc=null, mctx=null, MW=0,MH=0,MDPR=1,
       showK=true, showN=true, showP=true, dragging=null, JRN=null, curJ=-1, curStop=-1;
-  var LBL=[], LSEG=[];
+  var LBL=[], LSEG=[], KBOX=[];
 
   function mercY(lat){ lat=Math.max(-84,Math.min(84,lat)); return 180/Math.PI*Math.log(Math.tan(Math.PI/4+lat*Math.PI/360)) }
   function px(lon,lat){ return [MW/2+(lon-MV.lon)*MV.k, MH/2-(mercY(lat)-mercY(MV.lat))*MV.k] }
@@ -1223,6 +1223,8 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
         || cross(a,b,[r[2],r[3]],[r[0],r[3]]) || cross(a,b,[r[0],r[3]],[r[0],r[1]]);
   }
   function reserve(r){ LBL.push(r) }
+  // read-only view of the last map pass, for scripts/check.mjs - not used by the app
+  window.__cwAtlas={kingdomLabels:KBOX, routeSegs:LSEG, segHitsRect:function(a,b,r){return segHitsRect(a,b,r)}};
   function lblFree(c,text,x,y,align,font){
     c.font=font; var w=c.measureText(text).width;
     var x0=(align==='center')?x-w/2:(align==='right'?x-w:x);
@@ -1365,7 +1367,7 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
       if(showN){ c.strokeStyle=coast; c.lineWidth=0.8; c.stroke() }
     }
     var me=PL?PL[curPlace]:null;
-    LBL.length=0; LSEG.length=0;
+    LBL.length=0; LSEG.length=0; KBOX.length=0;
     // the route and its numbered markers are drawn later but claim space first,
     // or kingdom labels land on top of them
     if(curJ>=0 && JRN){
@@ -1397,7 +1399,7 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
         var ct=centroid(K.poly), cp=px(ct[0],ct[1]);
         if(cp[0]>40&&cp[0]<MW-40&&cp[1]>14&&cp[1]<MH-14){
           var kx=lblFree(c,K.n,cp[0],cp[1],'center',KF);
-          if(kx!==null){ c.font=KF; c.textAlign='left'; c.fillStyle=rub;
+          if(kx!==null){ KBOX.push({n:K.n, r:LBL[LBL.length-1]}); c.font=KF; c.textAlign='left'; c.fillStyle=rub;
             c.globalAlpha=here?1:.62; c.fillText(K.n,kx+3,cp[1]); c.globalAlpha=1; }
         }
       }
@@ -1565,6 +1567,14 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
     });
     mcv.addEventListener('wheel',function(e){ e.preventDefault(); zoomBy(e.deltaY<0?1.12:1/1.12) },{passive:false});
     window.addEventListener('resize',function(){ if(view==='atlas'){ sizeMap(); drawMap() } });
+    // the map's box also changes without a window resize: the stop strip appears with a
+    // journey, the place header wraps to two lines. A stale bitmap is then stretched to fit
+    // by CSS and the whole map renders squashed, so resize whenever the box itself does.
+    if(window.ResizeObserver) new ResizeObserver(function(){
+      if(view!=='atlas'||!mc) return;
+      var p=mc.parentNode;
+      if(p.clientWidth!==MW||p.clientHeight!==MH){ sizeMap(); drawMap() }
+    }).observe(mcv.parentNode);
   }
 
   /* ================= places view ================= */

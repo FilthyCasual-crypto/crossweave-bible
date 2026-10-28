@@ -128,6 +128,31 @@ async function page(opts = {}) {
   await p.close();
 }
 
+// ---------- atlas geometry, at two viewports ----------
+// Paul's second journey is the densest overlap of route and kingdom labels. Each viewport
+// asserts once, so the count stays fixed however many labels are placed.
+for (const vp of [{ width: 1440, height: 940 }, { width: 1400, height: 920 }]) {
+  const p = await page({ vp });
+  const tag = `atlas ${vp.width}x${vp.height}`;
+  await p.click('.nav button[data-view="atlas"]');
+  await p.waitForTimeout(2500);
+  const opt = await p.$$eval('#jsel option', o => (o.find(x => /second journey/i.test(x.textContent)) || {}).value);
+  await p.selectOption('#jsel', opt);
+  await p.waitForTimeout(1200);
+  const g = await p.evaluate(() => {
+    const c = document.getElementById('mapc'), A = window.__cwAtlas;
+    const crossed = A.kingdomLabels.filter(k => A.routeSegs.some(s => A.segHitsRect(s[0], s[1], k.r)))
+      .map(k => k.n);
+    return { bitmapH: c.height / devicePixelRatio, shownH: c.clientHeight,
+             labels: A.kingdomLabels.length, segs: A.routeSegs.length, crossed };
+  });
+  // the map box shrinks when the stop strip appears; a stale bitmap renders squashed
+  assert(Math.abs(g.bitmapH - g.shownH) <= 1 && g.segs > 0 && g.labels > 0 && !g.crossed.length,
+    `${tag}: bitmap ${g.bitmapH}px shown at ${g.shownH}px, ${g.segs} route segments, ` +
+    `${g.labels} kingdom labels, crossed by the route: ${JSON.stringify(g.crossed)}`);
+  await p.close();
+}
+
 // ---------- places ----------
 {
   const p = await page();
