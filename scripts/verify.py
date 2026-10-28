@@ -113,10 +113,18 @@ check(not bad, f"index.html must stay pure ASCII; found {bad!r} "
                "(use HTML entities in markup, \\uXXXX escapes in script)")
 
 # INVARIANT 4 (CLAUDE.md): a hand-drawn kingdom extent must never render solid. An empty
-# dash array on the "containing polity" branch is exactly how that regressed once.
-check('setLineDash(here?[]' not in html.replace(' ', ''),
-      "invariant 4: an approximate kingdom extent is drawn with no dash - solid is reserved "
-      "for openBible sourced boundaries")
+# dash array on the "containing polity" branch is exactly how that regressed once
+# (setLineDash(here?[]:[4,5])). This is a tripwire for a careless edit, not a proof: it flags
+# any ternary that yields an empty array, in either branch, whether passed to setLineDash
+# directly or through a variable. A determined rewrite gets past any grep; the real guard is
+# the comment at the call site plus review. The file has no legitimate `cond ? [] : x`, so a
+# hit here means look, not necessarily wrong - if it is legitimate, say why in a comment and
+# narrow this pattern rather than deleting it.
+_dense = re.sub(r'\s+', '', html)
+_solid = re.findall(r'.{0,40}(?:\?\[\]:|\?[^;:?]*:\[\][);,])', _dense)
+check(not _solid,
+      f"invariant 4: a ternary yields an empty dash array, which draws an approximate kingdom "
+      f"solid - solid is reserved for openBible sourced boundaries: {_solid}")
 
 # a literal \uXXXX escape inside markup renders as text, not a character
 head = html.split('<script>')[0]
