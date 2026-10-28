@@ -96,9 +96,19 @@ for k in kings:
 # journey stops must point at real places
 jr = json.load(open(os.path.join(APP, 'data/geo/journeys.json')))
 check(len(jr) == T['journeys'], f"{len(jr)} journeys, baseline expects {T['journeys']}")
+_bk = {b['n']: i for i, b in enumerate(books)}
+def _ref_key(r):
+    name, cv = r.rsplit(' ', 1); ch, v = cv.split(':')
+    return (_bk[name], int(ch), int(v))
 for j in jr:
     for w in j['w']:
         check(w['p'] in places, f"journey {j['id']}: stop {w['p']} not in gazetteer")
+    # stops resolve by walking forward through the passage; a verse that goes backwards means
+    # a return visit got its first-mention verse (or the wrong same-named place) again
+    keys = [_ref_key(w['r']) for w in j['w']]
+    for k in range(1, len(keys)):
+        check(keys[k] >= keys[k-1], f"journey {j['id']}: stop {k+1} {j['w'][k]['n']} "
+                                    f"({j['w'][k]['r']}) comes before stop {k} ({j['w'][k-1]['r']})")
 
 # span files cover every translation and book
 for tr in idx['trans']:
