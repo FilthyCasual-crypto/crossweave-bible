@@ -19,7 +19,8 @@ make sources   # fetch the five upstream datasets into sources/ (not vendored)
 make data      # full data rebuild, in dependency order (needs sources/)
 ```
 
-`make verify` is cheap and catches the two mistakes that have actually shipped. Run it.
+`make verify` is cheap and catches the mistakes that have actually shipped. Run it. It is the
+same thing as `python3 scripts/verify.py` — use whichever.
 
 `make check` runs 24 assertions across all five views and fails on any console or page
 error. Two env overrides: `CW_CHROMIUM=/path/to/chromium` to use a browser Playwright did
@@ -97,7 +98,7 @@ it cost 0.6pp of recall and was worth it.
 ## Architecture
 
 ```
-app/index.html     one file: ~2,000 lines, five views, five drawing engines
+app/index.html     one file: ~1803 lines, five views, five drawing engines
 app/data/          generated, committed, served as static files
 build/*.py         regeneration, must run in order (see below)
 ```
@@ -146,8 +147,11 @@ files `spans.py` writes. Run them out of order and you get stale or empty output
 
 - **Vanilla ES5-flavoured JS.** No framework, no bundler, no npm dependency in the app. The
   only dev dependency is Playwright, for `make check`, and it is not shipped.
-- **No external requests at runtime.** No map tiles, no CDN data. Natural Earth vectors are
-  vendored as JSON precisely so the app works offline and inside sandboxed embeds.
+- **No external requests for data.** No map tiles, no CDN data. Natural Earth vectors are
+  vendored as JSON so the geography works offline and inside sandboxed embeds. The one
+  exception is **webfonts**: the page loads EB Garamond and IBM Plex Sans from Google Fonts,
+  so offline or in a locked-down embed the type falls back to the declared stacks
+  (Georgia / system sans). Vendoring them is roadmap item 9 if true offline matters.
 - Build scripts are plain Python 3 stdlib. Keep it that way — no pandas, no shapely. The RDP
   simplifier in `geo.py` is 15 lines for that reason.
 - Numbers that line up in columns get `font-variant-numeric: tabular-nums`.
@@ -168,7 +172,15 @@ files `spans.py` writes. Run them out of order and you get stale or empty output
   `make verify` confirm.
 - **openBible has duplicate place names with different referents.** "Moab 1" is the kingdom
   (162 verses); "Moab 2" is the plains of Moab (12 verses) and is the one carrying a
-  boundary polygon. Do not merge them to borrow geometry.
+  boundary polygon. Do not merge them to borrow geometry. The UI shows the gazetteer id as a
+  disambiguator wherever a display name is shared.
+- **Never patch generated JSON by hand.** Two fields were once added to `places.json` and
+  `kingdoms.json` directly instead of in the build scripts; the next `make data` silently
+  dropped the verse counts and the whole Moab extent. `verify.py` now asserts both, but the
+  rule is: change the script, then rebuild.
+- **The build must stay deterministic.** `geo.py` once sorted surface forms by `-len` alone,
+  which left ties to set iteration order and produced a different file on every run. Sort keys
+  must be total orders.
 
 ---
 

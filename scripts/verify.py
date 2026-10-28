@@ -61,6 +61,17 @@ for f in ('arcs.json', 'geo/base.json', 'geo/places.json', 'geo/kingdoms.json', 
 places = json.load(open(os.path.join(APP, 'data/geo/places.json')))['places']
 for pid, pl in places.items():
     check(isinstance(pl.get('c'), list) and len(pl['c']) == 2, f"place {pid} has no coordinate pair")
+    # these were once patched into the JSON instead of emitted by geo.py, so a rebuild
+    # silently dropped them and took the gazetteer sort and map thinning with them
+    check(isinstance(pl.get('v'), int), f"place {pid} ({pl.get('n')}) has no verse count")
+    check(pl.get('id') == pid, f"place {pid} id field does not match its key")
+    check(pl.get('forms'), f"place {pid} ({pl.get('n')}) has no surface forms")
+
+kings = json.load(open(os.path.join(APP, 'data/geo/kingdoms.json')))
+check(len(kings) >= 13, f"only {len(kings)} kingdom extents; Moab was once lost this way")
+for k in kings:
+    check(k.get('n') and k.get('p'), f"kingdom {k.get('id')} missing name or period")
+    check(len(k.get('poly') or []) >= 4, f"kingdom {k.get('id')} polygon too small")
 
 # journey stops must point at real places
 jr = json.load(open(os.path.join(APP, 'data/geo/journeys.json')))
@@ -79,6 +90,12 @@ html = open(os.path.join(APP, 'index.html'), encoding='utf-8').read()
 bad = sorted({c for c in html if ord(c) > 127})
 check(not bad, f"index.html must stay pure ASCII; found {bad!r} "
                "(use HTML entities in markup, \\uXXXX escapes in script)")
+
+# INVARIANT 4 (CLAUDE.md): a hand-drawn kingdom extent must never render solid. An empty
+# dash array on the "containing polity" branch is exactly how that regressed once.
+check('setLineDash(here?[]' not in html.replace(' ', ''),
+      "invariant 4: an approximate kingdom extent is drawn with no dash - solid is reserved "
+      "for openBible sourced boundaries")
 
 # a literal \uXXXX escape inside markup renders as text, not a character
 head = html.split('<script>')[0]

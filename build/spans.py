@@ -1,7 +1,15 @@
 import json, os, re, collections
-OUT='/home/claude/isaac-bible/app'
+import os
+# Paths resolve from the repo, not from an author's machine.
+# Override with CW_ROOT (repo root) or CW_SOURCES (upstream datasets).
+_ROOT = os.environ.get('CW_ROOT') or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_SRC = os.environ.get('CW_SOURCES') or os.path.join(_ROOT, 'sources')
+_CACHE = os.path.join(_ROOT, '.build-cache')
+os.makedirs(_CACHE, exist_ok=True)
+
+OUT=os.path.join(_ROOT,'app')
 P=json.load(open(f'{OUT}/data/geo/places.json'))['places']
-MEN=json.load(open('/tmp/mentions.json'))
+MEN=json.load(open(os.path.join(_CACHE,'mentions.json')))
 IDX=json.load(open(f'{OUT}/data/index.json'))
 BOOKS=IDX['books']
 

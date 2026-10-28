@@ -154,6 +154,16 @@ async function page(opts = {}) {
   assert(/John 3/.test(await p.textContent('.ch-h')), 'palette: Enter did not navigate to the passage');
   const sel = await p.textContent('#rref');
   assert(/John 3:16/.test(sel), `palette: landed without selecting the verse (panel shows "${sel}")`);
+  // the side panel updating is not the same as the reader showing you the verse
+  const inView = await p.evaluate(() => {
+    const el = document.querySelector('.v.on');
+    if (!el) return 'nothing selected';
+    const r = el.getBoundingClientRect();
+    const h = document.getElementById('read').getBoundingClientRect();
+    return (r.top >= h.top - 2 && r.bottom <= h.bottom + 2)
+      ? true : `verse at y=${Math.round(r.top)}, pane is ${Math.round(h.top)}..${Math.round(h.bottom)}`;
+  });
+  assert(inView === true, `palette: selected verse was not scrolled into view (${inView})`);
   if (SHOTS) await p.screenshot({ path: '.shots/search.png' });
   await p.close();
 }
@@ -169,6 +179,10 @@ async function page(opts = {}) {
 {
   const p = await page({ vp: { width: 390, height: 780 } });
   assert(await p.isVisible('.tabs'), 'mobile: the bottom tab bar is not visible at 390px');
+  const hamburgers = await p.evaluate(() =>
+    [...document.querySelectorAll('.topin .ibtn svg path')]
+      .filter(el => (el.getAttribute('d').match(/M2 /g) || []).length >= 3).length);
+  assert(hamburgers <= 1, `mobile: ${hamburgers} hamburger-looking icons in the header, expected 1`);
   const scroll = await p.evaluate(() =>
     document.documentElement.scrollWidth > document.documentElement.clientWidth);
   assert(!scroll, 'mobile: the page scrolls horizontally at 390px');

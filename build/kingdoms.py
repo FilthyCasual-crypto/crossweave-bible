@@ -1,5 +1,13 @@
 import json, os
-OUT='/home/claude/isaac-bible/app'
+import os
+# Paths resolve from the repo, not from an author's machine.
+# Override with CW_ROOT (repo root) or CW_SOURCES (upstream datasets).
+_ROOT = os.environ.get('CW_ROOT') or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_SRC = os.environ.get('CW_SOURCES') or os.path.join(_ROOT, 'sources')
+_CACHE = os.path.join(_ROOT, '.build-cache')
+os.makedirs(_CACHE, exist_ok=True)
+
+OUT=os.path.join(_ROOT,'app')
 # Approximate territorial extents, hand-drawn from standard historical atlases.
 # Marked "approximate" in the UI and visually distinct from openBible's sourced boundaries.
 K=[
@@ -11,6 +19,8 @@ K=[
   "poly":[[34.95,31.96],[35.26,31.96],[35.47,31.74],[35.52,31.34],[35.34,30.94],[34.94,30.88],[34.58,31.14],[34.64,31.52],[34.80,31.78]]},
  {"id":"k_edom","n":"Edom","p":"c. 1200–550 BC","note":"South and east of the Dead Sea, astride the King's Highway.",
   "poly":[[35.20,30.90],[35.70,30.95],[36.00,30.55],[35.95,29.85],[35.50,29.55],[35.10,29.90],[35.02,30.45]]},
+ {"id":"k_moab","n":"Moab","p":"c. 1300\u2013600 BC","note":"East of the Dead Sea, between the Arnon and the Zered.",
+  "poly":[[35.45,31.52],[35.98,31.46],[36.18,31.08],[35.96,30.82],[35.52,30.90],[35.40,31.22]]},
  {"id":"k_phoen","n":"Phoenicia","p":"c. 1200–300 BC","note":"The coastal city-states of Tyre, Sidon and Byblos.",
   "poly":[[35.10,33.05],[35.45,33.20],[35.75,34.10],[36.00,34.70],[35.72,34.85],[35.30,34.20],[35.08,33.50]]},
  {"id":"k_egypt","n":"Egypt (New Kingdom core)","p":"c. 1550–1070 BC","note":"The Nile valley and delta — the heartland, not the full imperial reach.",

@@ -1,7 +1,15 @@
 import json, os, re, math, collections
+import os
+# Paths resolve from the repo, not from an author's machine.
+# Override with CW_ROOT (repo root) or CW_SOURCES (upstream datasets).
+_ROOT = os.environ.get('CW_ROOT') or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_SRC = os.environ.get('CW_SOURCES') or os.path.join(_ROOT, 'sources')
+_CACHE = os.path.join(_ROOT, '.build-cache')
+os.makedirs(_CACHE, exist_ok=True)
 
-GEO='/home/claude/isaac-bible/geo'
-OUT='/home/claude/isaac-bible/app'
+
+GEO=_SRC
+OUT=os.path.join(_ROOT,'app')
 os.makedirs(f'{OUT}/data/geo', exist_ok=True)
 
 BBOX=(9.0,10.0,64.0,48.5)   # lon0,lat0,lon1,lat1 — Rome to Persia, Nubia to the Black Sea
@@ -105,9 +113,13 @@ for a in A:
         if ' ' not in k and k.lower() in STOP: continue
         forms.append(k)
     if disp not in forms: forms.append(disp)
-    forms=sorted(set(forms), key=lambda s:-len(s))
+    # total order: -len alone leaves ties to set iteration, which makes the build non-deterministic
+    forms=sorted(set(forms), key=lambda s:(-len(s), s))
+    # verse count drives the gazetteer sort, palette ranking and the map's dot thinning
+    vc=sum(1 for v in (a.get('verses') or [])
+           if set((v.get('instance_types') or {}).keys()) & {'name','combined','partial','people_group'})
     places[pid]={'id':pid,'n':disp,'fid':fid,'t':(types[0] if types else 'place'),
-                 'c':best['c'],'mn':mname,'nc':len(cands),'poly':poly,
+                 'c':best['c'],'mn':mname,'nc':len(cands),'poly':poly,'v':vc,
                  'art':a.get('preceding_article') or '','slug':a.get('url_slug'),'forms':forms}
 
 print('places with coords:',len(places),'| with inline boundary:',sum(1 for p in places.values() if p['poly']))
@@ -130,5 +142,5 @@ for a in A:
 print('verses with at least one place:',len(mentions))
 json.dump({'places':places}, open(f'{OUT}/data/geo/places.json','w'), separators=(',',':'), ensure_ascii=False)
 print('places.json', round(os.path.getsize(f'{OUT}/data/geo/places.json')/1e6,2),'MB')
-with open('/tmp/mentions.json','w') as f:
+with open(os.path.join(_CACHE,'mentions.json'),'w') as f:
     json.dump({f'{k[0]}.{k[1]}.{k[2]}':v for k,v in mentions.items()}, f)

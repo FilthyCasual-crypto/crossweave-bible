@@ -117,6 +117,19 @@ with the path back to the origin verse visible, capped at a sensible node count.
 
 ---
 
+## 9. Vendor the webfonts
+
+`CLAUDE.md` claims no external runtime requests, and that is true of data but not of type: the
+page pulls EB Garamond and IBM Plex Sans from Google Fonts. Offline, or inside a locked-down
+embed, the type silently falls back to Georgia and the system sans. The layout survives it,
+but the identity does not.
+
+**Done when:** both families are subset to the Latin glyphs the app uses, inlined as
+`@font-face` data URIs, and the page makes no network request to any host but its own. Keep
+the fallback stacks regardless. Budget: under ~250 KB for all weights after subsetting.
+
+---
+
 ## Decided against, with reasons
 
 **NASB text.** Requires a written licence from the Lockman Foundation: free use caps at

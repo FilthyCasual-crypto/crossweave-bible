@@ -26,8 +26,8 @@ make verify && make check
 in every translation, every cross-reference target in range, every journey stop present in
 the gazetteer, and `app/index.html` still pure ASCII. It takes about a second.
 
-`check` renders all five views headless and fails on any console or page error, plus asserts
-the behaviours that have broken before — the trail leaking outside the reader, mojibake in
+`check` renders all five views headless (26 assertions, 8 screenshots with --shots) and fails on
+any console or page error, plus asserts the behaviours that have broken before — the trail leaking outside the reader, mojibake in
 the verse quote, a canvas sized before its container was visible, horizontal scroll at phone
 width.
 

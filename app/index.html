@@ -11,6 +11,7 @@
   --sel:#F2E9D8; --accent-2:#2E4A5C; --accent-soft:rgba(46,74,92,.10);
   --arc-in:#42587A; --arc-x:#A32520; --bar:#AFA795; --bar-nt:#6C8592;
   --sea:#E4E7E6; --land:#F2EFE7; --coast:#B9B3A4;
+  --king-fill:rgba(163,37,32,.11); --src-fill:rgba(46,74,92,.22); --stop-now:#A32520;
   --sh-1:0 1px 2px rgba(28,27,25,.05);
   --sh-2:0 4px 16px rgba(28,27,25,.09);
   --sh-3:0 16px 48px rgba(28,27,25,.20);
@@ -28,6 +29,7 @@
   --sel:#2A2721; --accent-2:#8FB4C8; --accent-soft:rgba(143,180,200,.12);
   --arc-in:#8EA6CC; --arc-x:#E07A6E; --bar:#4A4840; --bar-nt:#5C7079;
   --sea:#15181A; --land:#23231F; --coast:#3C3A33;
+  --king-fill:rgba(224,122,110,.14); --src-fill:rgba(143,180,200,.22); --stop-now:#E07A6E;
   --sh-1:0 1px 2px rgba(0,0,0,.4); --sh-2:0 4px 16px rgba(0,0,0,.45); --sh-3:0 16px 48px rgba(0,0,0,.6);
 }}
 :root[data-theme="dark"]{
@@ -39,6 +41,7 @@
   --sel:#2A2721; --accent-2:#8FB4C8; --accent-soft:rgba(143,180,200,.12);
   --arc-in:#8EA6CC; --arc-x:#E07A6E; --bar:#4A4840; --bar-nt:#5C7079;
   --sea:#15181A; --land:#23231F; --coast:#3C3A33;
+  --king-fill:rgba(224,122,110,.14); --src-fill:rgba(143,180,200,.22); --stop-now:#E07A6E;
   --sh-1:0 1px 2px rgba(0,0,0,.4); --sh-2:0 4px 16px rgba(0,0,0,.45); --sh-3:0 16px 48px rgba(0,0,0,.6);
 }
 [hidden]{display:none!important}
@@ -109,9 +112,9 @@ button{background:none;border:0;cursor:pointer}
 .btn.pri:hover{background:#8d1f1a;border-color:#8d1f1a;color:#fff}
 :root[data-theme="dark"] .btn.pri,:root:not([data-theme="light"]) .btn.pri{color:#1A1A17}
 
-.figures{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--rule);
+.figures{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--sheet);
   border:1px solid var(--rule);border-radius:var(--rd);margin:38px 0 34px;overflow:hidden}
-.fig{background:var(--sheet);padding:15px 16px}
+.fig{background:var(--sheet);padding:15px 16px;box-shadow:0 0 0 1px var(--rule)}
 .fig b{display:block;font-size:25px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--rubric);line-height:1.1}
 .fig span{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.085em;color:var(--muted);margin-top:5px;line-height:1.4}
 
@@ -405,12 +408,13 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
       <button class="sbtn" id="searchbtn">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="width:14px;height:14px;flex:0 0 auto">
           <circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>
-        <span>Search scripture &amp; places</span><kbd>&#8984;K</kbd>
+        <span>Jump to a passage or place</span><kbd>&#8984;K</kbd>
       </button>
       <button class="tpill" id="trbtn" title="Switch translation">&mdash;</button>
-      <button class="ibtn" id="setbtn" aria-label="Reading settings">
+      <button class="ibtn" id="setbtn" aria-label="Reading settings" title="Reading settings">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M2 4h12M2 8h8M2 12h10"/></svg>
+          <path d="M1.5 4.5h4M9.5 4.5h5M1.5 11.5h5M10.5 11.5h4"/>
+          <circle cx="7.5" cy="4.5" r="1.7"/><circle cx="8.5" cy="11.5" r="1.7"/></svg>
       </button>
     </div>
     <div class="trail" id="trail"></div>
@@ -680,7 +684,7 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
     <div class="pal-in">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
         <circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>
-      <input id="palq" type="text" placeholder="Try &ldquo;John 3:16&rdquo;, &ldquo;Nineveh&rdquo;, or &ldquo;voyage&rdquo;" autocomplete="off" spellcheck="false">
+      <input id="palq" type="text" placeholder="Passage, place or journey &mdash; try &ldquo;John 3:16&rdquo; or &ldquo;Nineveh&rdquo;" autocomplete="off" spellcheck="false">
     </div>
     <div class="pal-res" id="palres"></div>
     <div class="pal-hint">
@@ -941,8 +945,15 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
       }
       drawTrail();
     }
-    paintSel(); showRefs(b,c,v);
+    paintSel(); showRefs(b,c,v); revealVerse();
     LS.set('cw.pos',JSON.stringify(cur));
+  }
+  function revealVerse(){
+    // render() resets scrollTop, so a verse reached from search or a reference would
+    // otherwise sit below the fold with only the side panel showing it
+    var el=$('body').querySelector('.v.on'); if(!el) return;
+    var r=el.getBoundingClientRect(), host=$('read').getBoundingClientRect();
+    if(r.top < host.top+24 || r.bottom > host.bottom-24) el.scrollIntoView({block:'center'});
   }
   function paintSel(){
     var vs=$('body').querySelectorAll('.v');
@@ -1128,7 +1139,8 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
         +' verses<br><i>'+nfm(deg)+' linked chapters &middot; weight '+nfm(tot)+'</i>';
       tip.classList.add('on');
       var tw=tip.offsetWidth, left=Math.min(Math.max(e.clientX-r.left+14, 6), r.width-tw-6);
-      tip.style.left=left+'px'; tip.style.top=Math.max(6,e.clientY-r.top-10)+'px';
+      var ty=Math.max(6, e.clientY-r.top-10);
+      tip.style.left=left+'px'; tip.style.top=Math.min(ty, BASEY-tip.offsetHeight-8)+'px';
     });
     cv.addEventListener('mouseleave',function(){ hoverCh=-1; paintArc(); $('tip').classList.remove('on') });
     cv.addEventListener('click',function(e){
@@ -1168,7 +1180,7 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
   /* ================= places, bubble, atlas ================= */
   var MV={lon:35.2,lat:31.8,k:34}, mc=null, mctx=null, MW=0,MH=0,MDPR=1,
       showK=true, showN=true, showP=true, dragging=null, JRN=null, curJ=-1, curStop=-1;
-  var LBL=[];
+  var LBL=[], LSEG=[];
 
   function mercY(lat){ lat=Math.max(-84,Math.min(84,lat)); return 180/Math.PI*Math.log(Math.tan(Math.PI/4+lat*Math.PI/360)) }
   function px(lon,lat){ return [MW/2+(lon-MV.lon)*MV.k, MH/2-(mercY(lat)-mercY(MV.lat))*MV.k] }
@@ -1197,17 +1209,48 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
       KING?Promise.resolve(KING):jget('data/geo/kingdoms.json').then(function(d){KING=d})
     ]);
   }
+  function segHitsRect(a,b,r){
+    if(Math.max(a[0],b[0])<r[0]||Math.min(a[0],b[0])>r[2]
+     ||Math.max(a[1],b[1])<r[1]||Math.min(a[1],b[1])>r[3]) return false;
+    if((a[0]>=r[0]&&a[0]<=r[2]&&a[1]>=r[1]&&a[1]<=r[3])
+     ||(b[0]>=r[0]&&b[0]<=r[2]&&b[1]>=r[1]&&b[1]<=r[3])) return true;
+    function d(u,v,w){ return (v[0]-u[0])*(w[1]-u[1])-(v[1]-u[1])*(w[0]-u[0]) }
+    function cross(p1,p2,p3,p4){
+      var d1=d(p3,p4,p1),d2=d(p3,p4,p2),d3=d(p1,p2,p3),d4=d(p1,p2,p4);
+      return ((d1>0)!==(d2>0))&&((d3>0)!==(d4>0));
+    }
+    return cross(a,b,[r[0],r[1]],[r[2],r[1]]) || cross(a,b,[r[2],r[1]],[r[2],r[3]])
+        || cross(a,b,[r[2],r[3]],[r[0],r[3]]) || cross(a,b,[r[0],r[3]],[r[0],r[1]]);
+  }
+  function reserve(r){ LBL.push(r) }
   function lblFree(c,text,x,y,align,font){
     c.font=font; var w=c.measureText(text).width;
-    var x0=(align==='center')?x-w/2:x;
+    var x0=(align==='center')?x-w/2:(align==='right'?x-w:x);
     var r=[x0-3,y-10,x0+w+3,y+4];
     for(var i=0;i<LBL.length;i++){ var o=LBL[i];
       if(!(r[2]<o[0]||r[0]>o[2]||r[3]<o[1]||r[1]>o[3])) return null; }
+    // a label under the route line is unreadable even where no other label sits
+    for(var k=0;k<LSEG.length;k++) if(segHitsRect(LSEG[k][0],LSEG[k][1],r)) return null;
     LBL.push(r); return x0;
+  }
+  function owningKingdom(pl){
+    // the smallest hand-drawn extent containing this place, or -1
+    if(!pl||!KING) return -1;
+    var own=-1, ownA=1e9;
+    for(var i=0;i<KING.length;i++){
+      if(!inRing(pl.c[0],pl.c[1],KING[i].poly)) continue;
+      var ar=0, P=KING[i].poly;
+      for(var a=0,b=P.length-1;a<P.length;b=a++) ar+=(P[b][0]+P[a][0])*(P[b][1]-P[a][1]);
+      ar=Math.abs(ar/2);
+      if(ar<ownA){ ownA=ar; own=i; }
+    }
+    return own;
   }
   function placeLine(p){
     var t=p.t.charAt(0).toUpperCase()+p.t.slice(1);
-    return t + (p.nc>1 ? ' \u00B7 '+p.nc+' proposed sites' : '');
+    // several places share a display name (three distinct "Ai"); show the gazetteer id
+    // so they are tellable apart
+    return t + (p.dup ? ' \u00B7 '+p.fid : '') + (p.nc>1 ? ' \u00B7 '+p.nc+' proposed sites' : '');
   }
 
   /* ---- bubble ---- */
@@ -1272,10 +1315,15 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
         var p=PL[curPlace];
         $('atname').textContent=(p.art?p.art+' ':'')+p.n;
         var cn=countryAt(p.c[0],p.c[1]);
+        var ok2=owningKingdom(p);
         $('atsub').innerHTML=esc(placeLine(p))
           +(p.mn?' &middot; today <b>'+esc(p.mn)+'</b>':'')
           +(cn?', '+esc(cn):'')
-          +' &middot; '+nfm(p.v)+' verse'+(p.v===1?'':'s');
+          +' &middot; '+nfm(p.v)+' verse'+(p.v===1?'':'s')
+          // at settlement zoom the extent fills the view and its centroid label is off-canvas,
+          // so the shaded area would otherwise be unexplained
+          +(ok2>=0 ? '<br>Shaded area: <b>'+esc(KING[ok2].n)+'</b>, '+esc(KING[ok2].p)
+                     +' &mdash; approximate extent' : '');
         fitTo(p);
       } else if(opts.journey!==undefined){
         loadJourneys().then(function(){ $('jsel').value=String(opts.journey); setJourney(opts.journey) });
@@ -1304,6 +1352,7 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
     var cs=getComputedStyle(document.documentElement);
     var sea=cs.getPropertyValue('--sea').trim(), land=cs.getPropertyValue('--land').trim(),
         coast=cs.getPropertyValue('--coast').trim(), rub=cs.getPropertyValue('--rubric').trim(),
+        kfill=cs.getPropertyValue('--king-fill').trim(), srcfill=cs.getPropertyValue('--src-fill').trim(),
         acc=cs.getPropertyValue('--accent-2').trim(), mut=cs.getPropertyValue('--muted').trim(),
         ink=cs.getPropertyValue('--ink-2').trim();
     var c=mctx; c.setTransform(MDPR,0,0,MDPR,0,0);
@@ -1316,30 +1365,34 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
       if(showN){ c.strokeStyle=coast; c.lineWidth=0.8; c.stroke() }
     }
     var me=PL?PL[curPlace]:null;
-    LBL.length=0;
+    LBL.length=0; LSEG.length=0;
+    // the route and its numbered markers are drawn later but claim space first,
+    // or kingdom labels land on top of them
+    if(curJ>=0 && JRN){
+      var jp=JRN[curJ].w.map(function(w){return px(w.c[0],w.c[1])});
+      for(var s1=0;s1<jp.length-1;s1++) LSEG.push([jp[s1],jp[s1+1]]);
+      for(var s2=0;s2<jp.length;s2++) reserve([jp[s2][0]-9,jp[s2][1]-9,jp[s2][0]+9,jp[s2][1]+9]);
+    }
     var meXY=null;
     if(me){
       meXY=px(me.c[0],me.c[1]);
+      reserve([meXY[0]-9,meXY[1]-9,meXY[0]+9,meXY[1]+9]);
       lblFree(c,(me.art?me.art+' ':'')+me.n, meXY[0]+12.5, meXY[1]+3.5, 'left', '600 13px "EB Garamond",Georgia,serif');
     }
     if(showK && KING){
       var KF='600 10.5px "IBM Plex Sans",system-ui,sans-serif';
-      var own=-1, ownA=1e9;
-      if(me) for(var w0=0;w0<KING.length;w0++){
-        if(!inRing(me.c[0],me.c[1],KING[w0].poly)) continue;
-        var ar=0, P0=KING[w0].poly;
-        for(var w1=0,w2=P0.length-1;w1<P0.length;w2=w1++) ar+=(P0[w2][0]+P0[w1][0])*(P0[w2][1]-P0[w1][1]);
-        ar=Math.abs(ar/2);
-        if(ar<ownA){ ownA=ar; own=w0; }
-      }
+      var own=owningKingdom(me);
       for(var k2=0;k2<KING.length;k2++){
         var K=KING[k2], here=(k2===own);
         c.beginPath();
         for(var z=0;z<K.poly.length;z++){ var p2=px(K.poly[z][0],K.poly[z][1]); z?c.lineTo(p2[0],p2[1]):c.moveTo(p2[0],p2[1]) }
         c.closePath();
-        if(here){ c.fillStyle='rgba(163,37,32,.11)'; c.fill(); }
-        c.setLineDash(here?[]:[4,5]);
-        c.strokeStyle=rub; c.lineWidth=here?1.6:0.9; c.globalAlpha=here?.9:.30; c.stroke(); c.globalAlpha=1;
+        if(here){ c.fillStyle=kfill; c.fill(); }
+        // INVARIANT: approximate extents stay dashed at every emphasis level. Emphasise the
+        // containing polity with weight and a tighter dash, never by going solid - solid is
+        // reserved for openBible sourced boundaries. See CLAUDE.md invariant 4.
+        c.setLineDash(here?[7,3]:[4,5]);
+        c.strokeStyle=rub; c.lineWidth=here?1.7:0.9; c.globalAlpha=here?.95:.30; c.stroke(); c.globalAlpha=1;
         c.setLineDash([]);
         var ct=centroid(K.poly), cp=px(ct[0],ct[1]);
         if(cp[0]>40&&cp[0]<MW-40&&cp[1]>14&&cp[1]<MH-14){
@@ -1352,7 +1405,7 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
     if(me && me.poly){
       c.beginPath();
       for(var y=0;y<me.poly.length;y++){ var p3=px(me.poly[y][0],me.poly[y][1]); y?c.lineTo(p3[0],p3[1]):c.moveTo(p3[0],p3[1]) }
-      c.closePath(); c.fillStyle='rgba(46,74,92,.22)'; c.fill();
+      c.closePath(); c.fillStyle=srcfill; c.fill();
       c.strokeStyle=acc; c.lineWidth=1.6; c.stroke();
     }
     drawJourney(c, acc, sea);
@@ -1433,6 +1486,7 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
   }
   function drawJourney(c,acc,sea){
     if(curJ<0||!JRN) return;
+    var stopnow=getComputedStyle(document.documentElement).getPropertyValue('--stop-now').trim();
     var j=JRN[curJ], pts=j.w.map(function(w){return px(w.c[0],w.c[1])}), i;
     c.save();
     c.lineJoin='round'; c.lineCap='round';
@@ -1445,19 +1499,28 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
     for(var k=0;k<pts.length;k++){
       var on=(k===curStop), rr=on?9:6.5;
       c.beginPath(); c.arc(pts[k][0],pts[k][1],rr,0,6.284);
-      c.fillStyle=on?'#A32520':acc; c.fill();
+      c.fillStyle=on?stopnow:acc; c.fill();
       c.strokeStyle=sea; c.lineWidth=1.6; c.stroke();
       c.font=NF; c.textAlign='center'; c.fillStyle=sea;
       c.fillText(String(k+1), pts[k][0], pts[k][1]+3.2);
     }
     c.textAlign='left';
     var SF='600 11px "EB Garamond",Georgia,serif';
+    // One fixed offset loses every label once the markers and the route claim their space,
+    // so try around the marker: right, left, above, below.
+    var TRY=[[16,-5,'left'],[16,13,'left'],[-16,-5,'right'],[-16,13,'right'],
+             [0,-16,'center'],[0,23,'center']];
     for(var m=0;m<pts.length;m++){
-      var lx=lblFree(c,j.w[m].n,pts[m][0]+10,pts[m][1]-7,'left',SF);
+      var lx=null, ly=0;
+      for(var t=0;t<TRY.length;t++){
+        ly=pts[m][1]+TRY[t][1];
+        lx=lblFree(c,j.w[m].n,pts[m][0]+TRY[t][0],ly,TRY[t][2],SF);
+        if(lx!==null) break;
+      }
       if(lx===null) continue;
-      c.font=SF; c.fillStyle=sea; c.globalAlpha=.8;
-      c.fillRect(lx, pts[m][1]-17, c.measureText(j.w[m].n).width+6, 14); c.globalAlpha=1;
-      c.fillStyle=acc; c.fillText(j.w[m].n, lx+3, pts[m][1]-7);
+      c.font=SF; c.fillStyle=sea; c.globalAlpha=.82;
+      c.fillRect(lx-3, ly-10, c.measureText(j.w[m].n).width+6, 14); c.globalAlpha=1;
+      c.fillStyle=acc; c.fillText(j.w[m].n, lx, ly);
     }
     c.restore();
   }
@@ -1551,7 +1614,7 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
       var p=pvList[i];
       h+='<button class="pcard" data-p="'+p.id+'">'
         +'<div class="pn">'+esc((p.art?p.art+' ':'')+p.n)+'</div>'
-        +'<div class="pt">'+esc(p.t)+'</div>'
+        +'<div class="pt">'+esc(p.t)+(p.dup?' &middot; '+esc(p.fid):'')+'</div>'
         +(p.mn?'<div class="pm">'+esc(p.mn)+'</div>':'')
         +'<div class="pv2">'+nfm(p.v)+' verse'+(p.v===1?'':'s')+'</div></button>';
     }
@@ -1717,7 +1780,9 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
 
     jget('data/geo/places.json').then(function(g){
       PL=g.places;
-      for(var id in PL) PL[id].id=id;
+      var seen={};
+      for(var id in PL){ PL[id].id=id; seen[PL[id].n]=(seen[PL[id].n]||0)+1; }
+      for(var id2 in PL) if(seen[PL[id2].n]>1) PL[id2].dup=true;
       if(CACHE[cur.b]) render(CACHE[cur.b]);
       if(view==='places') renderPlaces();
       refreshHome();

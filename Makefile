@@ -18,7 +18,7 @@ check: ## render every view headless, fail on console/page errors
 #  CW_CHROMIUM=/path/to/chromium make check   -> use a browser Playwright did not install
 #  CW_BASE=http://host:port/index.html       -> check a deployed build instead of localhost
 
-shots: ## same as check, plus screenshots into .shots/
+shots: ## same as check, plus 8 screenshots into .shots/
 	@node scripts/check.mjs --shots && echo "screenshots in .shots/"
 
 dev-deps: ## install the only dev dependency (Playwright, for check/shots)
