@@ -128,6 +128,39 @@ async function page(opts = {}) {
   await p.close();
 }
 
+// ---------- journey markers: one per map point ----------
+// A revisit (Bethel, 4 and 8), places openBible puts on one coordinate (Rameses and
+// Pi-hahiroth), or places that overlap at this zoom (Bethel and Ai) must share one marker
+// carrying their ordinals, never stack. So: every waypoint's ordinal is on exactly one
+// marker (counted from the data, not the render code), no marker overlaps another, and
+// waypoints at an identical coordinate always share a marker.
+{
+  const p = await page();
+  await p.click('.nav button[data-view="atlas"]');
+  await p.waitForTimeout(2500);
+  const js = await p.evaluate(() => fetch('data/geo/journeys.json').then(r => r.json()));
+  for (let i = 0; i < js.length; i++) {
+    await p.selectOption('#jsel', String(i));
+    await p.waitForTimeout(700);
+    const m = await p.evaluate(() => window.__cwAtlas.markers);
+    const ords = m.flatMap(x => x.ords).sort((a, b) => a - b);
+    const allOnce = ords.length === js[i].w.length && ords.every((o, k) => o === k + 1);
+    const points = new Set(js[i].w.map(w => w.c.join(','))).size;
+    let overlap = null;
+    for (let a = 0; a < m.length && !overlap; a++)
+      for (let b = a + 1; b < m.length; b++)
+        if (Math.abs(m[a].x - m[b].x) < m[a].hw + m[b].hw && Math.abs(m[a].y - m[b].y) < 13) {
+          overlap = [m[a].txt, m[b].txt]; break;
+        }
+    assert(allOnce && !overlap && m.length <= points,
+      `journey "${js[i].n}": ${m.length} markers for ${points} distinct points, ` +
+      `ordinals ${allOnce ? 'each once' : JSON.stringify(ords)}` +
+      (overlap ? `, markers ${overlap[0]} and ${overlap[1]} overlap` : ''));
+  }
+  if (SHOTS) await p.screenshot({ path: '.shots/journey.png' });
+  await p.close();
+}
+
 // ---------- atlas geometry, at two viewports ----------
 // Paul's second journey is the densest overlap of route and kingdom labels. Each viewport
 // asserts once, so the count stays fixed however many labels are placed.

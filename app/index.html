@@ -1224,7 +1224,7 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
   }
   function reserve(r){ LBL.push(r) }
   // read-only view of the last map pass, for scripts/check.mjs - not used by the app
-  window.__cwAtlas={kingdomLabels:KBOX, routeSegs:LSEG, segHitsRect:function(a,b,r){return segHitsRect(a,b,r)}};
+  window.__cwAtlas={kingdomLabels:KBOX, routeSegs:LSEG, markers:[], segHitsRect:function(a,b,r){return segHitsRect(a,b,r)}};
   function lblFree(c,text,x,y,align,font){
     c.font=font; var w=c.measureText(text).width;
     var x0=(align==='center')?x-w/2:(align==='right'?x-w:x);
@@ -1373,7 +1373,8 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
     if(curJ>=0 && JRN){
       var jp=JRN[curJ].w.map(function(w){return px(w.c[0],w.c[1])});
       for(var s1=0;s1<jp.length-1;s1++) LSEG.push([jp[s1],jp[s1+1]]);
-      for(var s2=0;s2<jp.length;s2++) reserve([jp[s2][0]-9,jp[s2][1]-9,jp[s2][0]+9,jp[s2][1]+9]);
+      var SG=stopGroups(c,JRN[curJ]);
+      for(var s2=0;s2<SG.length;s2++) reserve([SG[s2].x-SG[s2].hw-2.5,SG[s2].y-9,SG[s2].x+SG[s2].hw+2.5,SG[s2].y+9]);
     }
     var meXY=null;
     if(me){
@@ -1486,10 +1487,46 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
     $('atsub').innerHTML=esc(j.s)+' &middot; <b>'+j.w.length+'</b> stops &middot; '+esc(j.note);
     fitJourney(j); drawStops(); drawMap();
   }
+  var NF='600 9px "IBM Plex Sans",system-ui,sans-serif';
+  // Stops that would draw on top of each other share one marker carrying all their
+  // ordinals: a return visit (Bethel, 4,8), places openBible puts on one best-guess
+  // coordinate (Rameses and Pi-hahiroth), and places a few km apart that overlap at this
+  // zoom (Bethel and Ai). Grouping is by screen overlap, so zooming in separates them again.
+  // The route still visits each waypoint in order; the stop strip keeps one entry per
+  // waypoint. hw is the marker's half-width: a circle, or a pill sized to its text.
+  function sizeGroup(c,g){
+    var o=g.ords; c.font=NF;
+    g.txt = o.length>3 ? o[0]+','+o[1]+'+' : o.join(',');
+    g.hw = o.length>1 ? Math.max(6.5, c.measureText(g.txt).width/2+5) : 6.5;
+  }
+  function stopGroups(c,j){
+    var out=[];
+    for(var i=0;i<j.w.length;i++){
+      var w=j.w[i], p=px(w.c[0],w.c[1]), g=null;
+      for(var k=0;k<out.length;k++)   // touching: within both half-widths plus a 1px gap
+        if(Math.abs(out[k].x-p[0])<out[k].hw+7.5 && Math.abs(out[k].y-p[1])<14){ g=out[k]; break }
+      if(!g){ g={x:p[0],y:p[1],ords:[],names:[],idx:[]}; out.push(g) }
+      g.ords.push(i+1); g.idx.push(i);
+      if(g.names.indexOf(w.n)<0) g.names.push(w.n);
+      sizeGroup(c,g);
+    }
+    return out;
+  }
+  function stopShape(c,g,h){
+    // a circle for one ordinal; a pill, same height, for several
+    var r=h/2, hw=Math.max(r, g.hw*(h/13));
+    c.beginPath();
+    if(g.ords.length<2){ c.arc(g.x,g.y,r,0,6.284); return }
+    c.moveTo(g.x-hw+r,g.y-r); c.lineTo(g.x+hw-r,g.y-r);
+    c.arc(g.x+hw-r,g.y,r,-1.5708,1.5708); c.lineTo(g.x-hw+r,g.y+r);
+    c.arc(g.x-hw+r,g.y,r,1.5708,4.7124); c.closePath();
+  }
   function drawJourney(c,acc,sea){
     if(curJ<0||!JRN) return;
     var stopnow=getComputedStyle(document.documentElement).getPropertyValue('--stop-now').trim();
     var j=JRN[curJ], pts=j.w.map(function(w){return px(w.c[0],w.c[1])}), i;
+    var G=stopGroups(c,j);
+    window.__cwAtlas.markers=G.map(function(g){return {x:g.x,y:g.y,hw:g.hw,ords:g.ords.slice(),txt:g.txt}});
     c.save();
     c.lineJoin='round'; c.lineCap='round';
     c.strokeStyle=sea; c.lineWidth=5.5; c.globalAlpha=.75;
@@ -1497,32 +1534,33 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
     c.strokeStyle=acc; c.lineWidth=2.2; c.globalAlpha=.95;
     c.beginPath(); for(i=0;i<pts.length;i++) i?c.lineTo(pts[i][0],pts[i][1]):c.moveTo(pts[i][0],pts[i][1]); c.stroke();
     c.globalAlpha=1;
-    var NF='600 9px "IBM Plex Sans",system-ui,sans-serif';
-    for(var k=0;k<pts.length;k++){
-      var on=(k===curStop), rr=on?9:6.5;
-      c.beginPath(); c.arc(pts[k][0],pts[k][1],rr,0,6.284);
+    for(var k=0;k<G.length;k++){
+      var on=G[k].idx.indexOf(curStop)>=0;
+      stopShape(c,G[k],on?18:13);
       c.fillStyle=on?stopnow:acc; c.fill();
       c.strokeStyle=sea; c.lineWidth=1.6; c.stroke();
       c.font=NF; c.textAlign='center'; c.fillStyle=sea;
-      c.fillText(String(k+1), pts[k][0], pts[k][1]+3.2);
+      c.fillText(G[k].txt, G[k].x, G[k].y+3.2);
     }
     c.textAlign='left';
     var SF='600 11px "EB Garamond",Georgia,serif';
     // One fixed offset loses every label once the markers and the route claim their space,
     // so try around the marker: right, left, above, below.
-    var TRY=[[16,-5,'left'],[16,13,'left'],[-16,-5,'right'],[-16,13,'right'],
+    // side offsets clear the marker's half-width, so a pill pushes its label out with it
+    var TRY=[[1,-5,'left'],[1,13,'left'],[-1,-5,'right'],[-1,13,'right'],
              [0,-16,'center'],[0,23,'center']];
-    for(var m=0;m<pts.length;m++){
-      var lx=null, ly=0;
+    for(var m=0;m<G.length;m++){
+      // two names at most, like the ordinals; the strip below carries the full sequence
+      var nms=G[m].names, nm=nms.slice(0,2).join(' / ')+(nms.length>2?' +'+(nms.length-2):''), lx=null, ly=0;
       for(var t=0;t<TRY.length;t++){
-        ly=pts[m][1]+TRY[t][1];
-        lx=lblFree(c,j.w[m].n,pts[m][0]+TRY[t][0],ly,TRY[t][2],SF);
+        ly=G[m].y+TRY[t][1];
+        lx=lblFree(c,nm,G[m].x+TRY[t][0]*(G[m].hw+9.5),ly,TRY[t][2],SF);
         if(lx!==null) break;
       }
       if(lx===null) continue;
       c.font=SF; c.fillStyle=sea; c.globalAlpha=.82;
-      c.fillRect(lx-3, ly-10, c.measureText(j.w[m].n).width+6, 14); c.globalAlpha=1;
-      c.fillStyle=acc; c.fillText(j.w[m].n, lx, ly);
+      c.fillRect(lx-3, ly-10, c.measureText(nm).width+6, 14); c.globalAlpha=1;
+      c.fillStyle=acc; c.fillText(nm, lx, ly);
     }
     c.restore();
   }

@@ -22,7 +22,7 @@ make data      # full data rebuild, in dependency order (refuses to run on drift
 `make verify` is cheap and catches the mistakes that have actually shipped. Run it. It is the
 same thing as `python3 scripts/verify.py` — use whichever.
 
-`make check` runs 28 assertions across all five views and fails on any console or page
+`make check` runs 35 assertions across all five views and fails on any console or page
 error. Two env overrides: `CW_CHROMIUM=/path/to/chromium` to use a browser Playwright did
 not install, `CW_BASE=https://host/index.html` to check a deployed build instead of
 localhost.
@@ -120,7 +120,14 @@ keeps a list of occupied rectangles and refuses overlaps, and on the map also re
 a route segment crosses. Priority order on the map: the active route and its markers claim
 space first, then the headline place, then kingdoms, then nearby places ranked by scripture
 frequency. Labels that would collide are dropped, never stacked. `window.__cwAtlas` exposes
-the last pass's kingdom label boxes and route segments so `check.mjs` can assert on them.
+the last pass's kingdom label boxes, route segments and journey markers so `check.mjs` can
+assert on them.
+
+**Journey markers are per map point, not per waypoint.** Stops that would draw on top of
+each other at the current zoom (a return visit, two places openBible puts on one
+coordinate, or places a few km apart) share one marker: a pill carrying their ordinals
+(`4,5,8`, capped as `41,43+`) and one label (`Bethel / Ai`, capped as `A / B +2`). The route
+line and the stop strip stay one-per-waypoint. Zooming in separates markers again.
 
 **The map canvas follows its box, not the window.** The atlas box changes height without a
 window resize (the stop strip appears with a journey; the place header wraps to two lines).
