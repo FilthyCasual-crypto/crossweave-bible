@@ -116,6 +116,29 @@ for tr in idx['trans']:
         check(os.path.exists(os.path.join(APP, 'data/geo', f"{tr['id']}-{bi}.json")),
               f"missing place spans for {tr['id']} book {bi}")
 
+# full-text search index: present for every translation, and not stale. Rebuilding it in
+# memory and comparing is the only check that catches "text rebuilt, search.py not re-run",
+# which would otherwise ship results that point at the wrong verses with no error anywhere.
+sys.path.insert(0, os.path.join(os.path.dirname(APP), 'build'))
+import search as _search
+_mp = os.path.join(APP, 'data/s/meta.json')
+if check(os.path.exists(_mp), "missing data/s/meta.json - run build/search.py"):
+    _meta = json.load(open(_mp))
+    check(_meta['stop'] == _search.STOP, "data/s/meta.json stoplist differs from build/search.py - rebuild")
+    for tr in idx['trans']:
+        t = tr['id']
+        _d = os.path.join(APP, 'data/s', t)
+        if not check(os.path.isdir(_d) and t in _meta['shards'], f"search: no index for {t} - run build/search.py"):
+            continue
+        _want = _search.shards_of(_search.index(t)[0])
+        _have = sorted(f[:-5] for f in os.listdir(_d) if f.endswith('.json'))
+        check(_have == sorted(_want) == _meta['shards'][t],
+              f"search {t}: shard files, meta.json and a fresh build disagree on the shard list - rebuild")
+        _stale = [k for k in _want if k in _have and
+                  open(os.path.join(_d, k + '.json'), encoding='ascii').read() != _search.body(_want[k])]
+        check(not _stale, f"search {t}: {len(_stale)} shards are stale against the text "
+                          f"(e.g. {_stale[:3]}) - run build/search.py")
+
 # the ASCII rule - see CLAUDE.md invariant 2
 html = open(os.path.join(APP, 'index.html'), encoding='utf-8').read()
 bad = sorted({c for c in html if ord(c) > 127})

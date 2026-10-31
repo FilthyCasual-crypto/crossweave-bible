@@ -1,7 +1,7 @@
 # Crossweave — working notes for Claude Code
 
 A static, hyperlinked Bible reader. No backend, no build step for the app itself, no runtime
-dependencies. `app/index.html` is the entire application; `app/data/` is 17 MB of generated
+dependencies. `app/index.html` is the entire application; `app/data/` is 18 MB of generated
 JSON; `build/` regenerates that JSON from public datasets.
 
 Read `README.md` for what the product is. This file is about how to work on it safely.
@@ -22,7 +22,7 @@ make data      # full data rebuild, in dependency order (refuses to run on drift
 `make verify` is cheap and catches the mistakes that have actually shipped. Run it. It is the
 same thing as `python3 scripts/verify.py` — use whichever.
 
-`make check` runs 35 assertions across all five views and fails on any console or page
+`make check` runs 45 assertions across all five views and fails on any console or page
 error. Two env overrides: `CW_CHROMIUM=/path/to/chromium` to use a browser Playwright did
 not install, `CW_BASE=https://host/index.html` to check a deployed build instead of
 localhost.
@@ -110,6 +110,17 @@ home, read, web (arc diagram), atlas (map), places (gazetteer).
 into `{book, chapter, verse}` by binary search over book start offsets; `gidx(b,c,v)` goes
 the other way. Cross-references are `[targetIndex, span, weight]`.
 
+**Full-text search is a static inverted index.** `build/search.py` writes
+`data/s/<trans>/<xx>.json`, one shard per first two letters of a token, mapping token ->
+delta-encoded base-36 verse indices, plus `data/s/meta.json` (stoplist, shard list). The
+palette fetches only the shards a query's terms need: under 30 KB per query, against a 150 KB
+budget `check.mjs` enforces. Tokenising is duplicated in `search.py` and `stoks()` in
+`index.html` - NFKD, strip marks, lowercase, `[a-z0-9]+`, length >= 2 - and the two must
+change together. Phrases in quotes are verified against the loaded verse text with one-letter
+words kept, so `"I am"` does not match "Am I". Verse results are async and debounced (150 ms)
+behind a sequence number; reference, place and journey matches stay synchronous and on top.
+The BSB's sixteen bracketed omission notes are not indexed.
+
 **Everything visual is canvas.** Well over 100,000 arcs and a full vector map are far past the DOM.
 The arc view draws once into an offscreen canvas in 9,000-arc chunks across animation frames,
 then composites that buffer plus the hovered subset. The map redraws wholesale on pan/zoom,
@@ -149,8 +160,13 @@ add it as a token in all three places or dark mode breaks silently.
 ```
 build.py  ->  arcs.py
           ->  geo.py  ->  spans.py  ->  journeys.py
+          ->  search.py
               kingdoms.py (independent)
 ```
+
+`search.py` reads the per-book text in `app/data/<trans>/`, so any change to the text needs it
+re-run. `verify.py` rebuilds the index in memory and fails on a stale shard, so you will find
+out, but run `make data` rather than single scripts and the order is never in question.
 
 `geo.py` writes `.build-cache/mentions.json`, which `spans.py` consumes. `journeys.py` reads the span
 files `spans.py` writes. Run them out of order and you get stale or empty output with no error.
@@ -223,8 +239,8 @@ to run on drifted sources. That failure is not a build error, it is a decision:
 
 ## Where to pick up
 
-`docs/ROADMAP.md` has the prioritised list with acceptance criteria. The top item is
-**full-text search of scripture**, which is the conspicuous gap in a Bible app and needs a
-built inverted index shipped as static shards, not a runtime scan.
+`docs/ROADMAP.md` has the prioritised list with acceptance criteria. Full-text search
+(item 1) shipped in v1.1.0; the top open item is **confidence rendering on uncertain map
+stops**.
 
 Before any commit: `make verify && make check`.

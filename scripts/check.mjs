@@ -230,6 +230,75 @@ for (const vp of [{ width: 1440, height: 940 }, { width: 1400, height: 920 }]) {
   await p.close();
 }
 
+// ---------- full-text search (ROADMAP item 1's acceptance criteria) ----------
+{
+  const p = await page();
+  let idxBytes = 0;
+  p.on('response', async r => {
+    if (/\/data\/s\//.test(r.url())) { try { idxBytes += (await r.body()).length; } catch (e) {} }
+  });
+  const search = async q => {
+    await p.keyboard.press('Control+k');
+    await p.fill('#palq', q);
+    await p.waitForFunction(() => {
+      const s = [...document.querySelectorAll('.pal-sec')].map(e => e.textContent).join(' ');
+      return s && !/Searching/.test(s);
+    }, null, { timeout: 8000 }).catch(() => {});
+  };
+
+  // a word: verses come back, the word is highlighted, rarity ranking puts ties in canon order
+  await search('beginning');
+  const rows = await p.$$eval('.pr.pv', e => e.map(x => x.querySelector('.pr-n').textContent));
+  const marks = await p.$$eval('.pr.pv .pr-t mark', e => e.map(x => x.textContent.toLowerCase()));
+  assert(rows[0] === 'Genesis 1:1', `search: "beginning" first result is "${rows[0]}", expected Genesis 1:1`);
+  assert(rows.length === 20 && marks.length >= 20 && marks.every(m => m.startsWith('beginning')),
+    `search: "beginning" gave ${rows.length} rows, ${marks.length} highlights (${marks.slice(0, 3)})`);
+  assert(idxBytes > 0 && idxBytes < 150000, `search: one query loaded ${idxBytes} bytes of index, budget is 150 KB`);
+
+  // rarity: a rare word outranks a common one when both match
+  await p.keyboard.press('Escape');
+  await search('lamb slain');
+  const ls = await p.$$eval('.pr.pv .pr-n', e => e.map(x => x.textContent));
+  assert(ls.includes('Revelation 5:12'), `search: "lamb slain" missed Revelation 5:12 (${ls.slice(0, 4)})`);
+
+  // a phrase: word order and one-letter words both count
+  await p.keyboard.press('Escape');
+  await search('"am I"');
+  const ph = await p.$$eval('.pr.pv .pr-n', e => e.map(x => x.textContent));
+  assert(ph[0] === 'Genesis 4:9', `search: phrase "am I" first result is "${ph[0]}", expected Genesis 4:9`);
+  await p.keyboard.press('Escape');
+  await search('"I am"');
+  const ph2 = await p.$$eval('.pr.pv .pr-n', e => e.map(x => x.textContent));
+  assert(ph2.length && !ph2.includes('Genesis 4:9'), `search: phrase "I am" matched "Am I" in Genesis 4:9`);
+
+  // passage lookups stay instant and are not crowded out by word results
+  await p.keyboard.press('Escape');
+  await search('john 3:16');
+  assert(!(await p.$$('.pr.pv')).length, 'search: a passage reference also ran a word search');
+
+  // the omission notes hold no scripture and must not be found
+  await p.keyboard.press('Escape');
+  await search('manuscripts');
+  assert(!(await p.$$('.pr.pv')).length, 'search: found a bracketed omission note as if it were a verse');
+
+  // selecting a result opens that verse in the reader with its cross-references
+  await p.keyboard.press('Escape');
+  await search('still small voice');
+  const hit = await p.$$eval('.pr', e => e.findIndex(x => x.classList.contains('pv')));
+  for (let k = 0; k < hit; k++) await p.keyboard.press('ArrowDown');
+  await p.keyboard.press('Enter');
+  await p.waitForTimeout(1600);
+  const rref = await p.textContent('#rref');
+  assert(/1 Kings 19:12/.test(rref), `search: Enter on a verse result landed on "${rref}"`);
+  const xr = (await p.$$('#rlist .xr')).length;
+  assert(xr > 0, 'search: the verse opened without its cross-references');
+  if (SHOTS) {
+    await search('"in the beginning"');
+    await p.screenshot({ path: '.shots/fulltext.png' });
+  }
+  await p.close();
+}
+
 // ---------- dark + mobile ----------
 {
   const p = await page({ dark: true });

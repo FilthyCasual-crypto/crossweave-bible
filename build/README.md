@@ -41,9 +41,12 @@ python3 build/geo.py         # base map + gazetteer (writes .build-cache/mention
 python3 build/spans.py       # place-name offsets per translation (needs geo.py)
 python3 build/kingdoms.py    # hand-drawn kingdom extents
 python3 build/journeys.py    # curated routes (needs spans.py)
+python3 build/search.py      # full-text index per translation (needs build.py)
 ```
 
-`geo.py` must run before `spans.py`, and `spans.py` before `journeys.py`.
+`geo.py` must run before `spans.py`, and `spans.py` before `journeys.py`. `search.py` reads the
+text `build.py` writes, so it runs after it; `verify.py` rebuilds the index in memory and fails
+if the committed shards are stale against the text.
 
 ## What each script asserts
 

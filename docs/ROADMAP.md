@@ -5,27 +5,18 @@ to stop. Items are sized to be finishable in one sitting unless marked otherwise
 
 ---
 
-## 1. Full-text search of scripture — **the conspicuous gap**
+## 1. Full-text search of scripture — **done in v1.1.0**
 
-Search currently finds references, place names and journeys. It does not find *words*. In a
-Bible app that is the first thing a reader reaches for.
+Static inverted index per translation (`build/search.py` -> `app/data/s/`), sharded by
+two-letter token prefix; a query loads under 30 KB of index. Words match as prefixes from three
+characters, ranked by rarity (an exact word before a longer word it prefixes, ties in canon
+order); `"quoted phrases"` are exact and checked against the verse text. Results are async and
+debounced, under the synchronous reference/place/journey matches. Selecting one opens the
+verse in the reader with its cross-references. `verify.py` fails on a stale index;
+`check.mjs` asserts the acceptance criteria, including the 150 KB budget.
 
-**Approach.** Build an inverted index at build time; ship it as static shards. Do not scan
-31,102 verses in the browser on every keystroke.
-
-- Tokenise lowercase, strip punctuation, drop a small stoplist (the, and, of, to, …).
-- Map token to a list of global verse indices. Roughly 12–14k distinct tokens after
-  stemming-free normalisation.
-- Shard by first two characters of the token so a query loads one small file, not the index.
-- Index the BSB and the KJV separately — they share versification, not vocabulary.
-
-**Done when:** typing three or more characters in the command palette returns matching verses
-with the matched term highlighted, ranked by how rare the term is, and selecting one opens
-that verse in the reader with its cross-references loaded. Phrase search in quotes works.
-Index payload for a typical query is under 150 KB.
-
-**Watch for:** the palette currently assumes a small synchronous result set. Verse results
-need to be async and debounced, and must not block the existing reference/place matching.
+Not done, deliberately: stemming ("love" does not find "loveth" unless typed as the prefix
+"lov"), and a full results page beyond the top 20.
 
 ---
 

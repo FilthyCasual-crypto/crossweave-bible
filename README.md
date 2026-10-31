@@ -13,6 +13,7 @@ cross-references.
 | Places mapped | 1,335, with modern site names and coordinates |
 | Journey routes | 7, each stop keyed to the verse that names it |
 | Translations | Berean Standard Bible, King James Version |
+| Search | Every word of both translations, phrases in quotes, ranked rarest first |
 
 Everything is static. No backend, no accounts, no database, nothing to pay for — which is
 what makes "free" structurally true rather than aspirational.
@@ -67,6 +68,10 @@ app/
       journeys.json     7 routes, each stop carrying its verse reference
       bsb-<0-65>.json   character offsets of every place name in the BSB text
       kjv-<0-65>.json   the same for the KJV
+    s/
+      meta.json         stoplist and shard list for full-text search
+      bsb/<xx>.json     inverted index, one shard per two-letter token prefix
+      kjv/<xx>.json     the same for the KJV
 build/
   build.py              verse text + cross-reference graph -> data/index.json, bsb/, kjv/, x/
   arcs.py               verse-level graph -> chapter-level arcs.json
@@ -74,6 +79,7 @@ build/
   spans.py              place-name matching -> geo/<trans>-<book>.json
   kingdoms.py           the hand-drawn approximate kingdom extents
   journeys.py           curated itineraries -> geo/journeys.json
+  search.py             verse text -> s/ (full-text index, both translations)
 ```
 
 ### Design decisions worth knowing before you change anything

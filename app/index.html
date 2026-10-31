@@ -331,6 +331,15 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
 .pal-hint{padding:8px 15px;border-top:1px solid var(--rule);font-size:10.5px;color:var(--muted);
   display:flex;gap:14px;background:var(--raise)}
 .pal-hint b{font-weight:600;color:var(--ink-2)}
+.pr.pv{flex-wrap:wrap;row-gap:3px}
+.pr.pv .pr-n{font-family:var(--f-ui);font-size:13px;font-weight:600;color:var(--ink-2)}
+.pr.pv.sel .pr-n{color:var(--rubric)}
+.pr-t{flex:1 0 100%;font-family:var(--f-scr);font-size:15px;line-height:1.4;color:var(--ink)}
+.pr-t mark{background:none;color:var(--rubric);font-weight:600;
+  text-decoration:underline;text-decoration-color:var(--rubric-mid);text-underline-offset:2px}
+.pal-sec{padding:10px 15px 4px;font-size:10px;text-transform:uppercase;letter-spacing:.09em;
+  color:var(--muted);font-variant-numeric:tabular-nums;border-top:1px solid var(--rule);margin-top:4px}
+.pal-res > .pal-sec:first-child{border-top:0;margin-top:0}
 
 /* ============ settings sheet ============ */
 .set{position:fixed;right:12px;top:56px;z-index:80;width:252px;background:var(--sheet);border:1px solid var(--rule);
@@ -408,7 +417,7 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
       <button class="sbtn" id="searchbtn">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="width:14px;height:14px;flex:0 0 auto">
           <circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>
-        <span>Jump to a passage or place</span><kbd>&#8984;K</kbd>
+        <span>Search passages, places, words</span><kbd>&#8984;K</kbd>
       </button>
       <button class="tpill" id="trbtn" title="Switch translation">&mdash;</button>
       <button class="ibtn" id="setbtn" aria-label="Reading settings" title="Reading settings">
@@ -684,11 +693,11 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
     <div class="pal-in">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
         <circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>
-      <input id="palq" type="text" placeholder="Passage, place or journey &mdash; try &ldquo;John 3:16&rdquo; or &ldquo;Nineveh&rdquo;" autocomplete="off" spellcheck="false">
+      <input id="palq" type="text" placeholder="Passage, place, journey or words &mdash; try &ldquo;John 3:16&rdquo; or &ldquo;still small voice&rdquo;" autocomplete="off" spellcheck="false">
     </div>
     <div class="pal-res" id="palres"></div>
     <div class="pal-hint">
-      <span><b>&uarr;&darr;</b> navigate</span><span><b>&crarr;</b> open</span><span><b>esc</b> close</span>
+      <span><b>&uarr;&darr;</b> navigate</span><span><b>&crarr;</b> open</span><span><b>esc</b> close</span><span><b>&quot;&hellip;&quot;</b> exact phrase</span>
     </div>
   </div>
 </div>
@@ -1671,15 +1680,15 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
   }
 
   /* ================= command palette ================= */
-  var palSel=0, palItems=[];
+  var palSel=0, palItems=[], palBase=[], palVerse=[], palNote='', palTimer=0, palSeq=0;
   function openPal(){
     $('palscrim').hidden=false; $('palq').value=''; palSel=0;
     palRender(''); setTimeout(function(){$('palq').focus()},20);
   }
-  function closePal(){ $('palscrim').hidden=true }
+  function closePal(){ $('palscrim').hidden=true; palSeq++; clearTimeout(palTimer) }
   function palRender(q){
     q=q.trim();
-    palItems=[];
+    var base=[], passage=false;
     var m=q.match(/^(\d?\s*[A-Za-z][A-Za-z ]*?)\s*(\d+)?\s*(?::\s*(\d+))?$/);
     var ql=q.toLowerCase();
     if(ql){
@@ -1687,7 +1696,7 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
       for(var i=0;i<BOOKS.length;i++){
         var bn=BOOKS[i].n.toLowerCase();
         if(bn.indexOf(ql)===0 || bn.replace(/\s/g,'').indexOf(ql.replace(/\s/g,''))===0)
-          palItems.push({k:'Book',n:BOOKS[i].n,d:BOOKS[i].c.length+' chapters',go:{b:i,c:1}});
+          base.push({k:'Book',n:BOOKS[i].n,d:BOOKS[i].c.length+' chapters',go:{b:i,c:1}});
       }
       if(m && m[2]){
         var want=m[1].trim().toLowerCase();
@@ -1696,8 +1705,9 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
           if(nb.indexOf(want)===0||nb.replace(/\s/g,'').indexOf(want.replace(/\s/g,''))===0){
             var ch=Math.min(+m[2], BOOKS[j].c.length);
             var vs=m[3]?Math.min(+m[3], BOOKS[j].c[ch-1]):null;
-            palItems.unshift({k:'Passage',n:BOOKS[j].n+' '+ch+(vs?':'+vs:''),
+            base.unshift({k:'Passage',n:BOOKS[j].n+' '+ch+(vs?':'+vs:''),
               d:vs?'open verse':'open chapter', go:{b:j,c:ch,v:vs}});
+            passage=true;
             break;
           }
         }
@@ -1714,33 +1724,217 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
         hits.sort(function(a,b){return a[0]-b[0] || a[1]-b[1]});
         for(var h2=0;h2<Math.min(hits.length,8);h2++){
           var pp=hits[h2][2];
-          palItems.push({k:'Place',n:(pp.art?pp.art+' ':'')+pp.n,
+          base.push({k:'Place',n:(pp.art?pp.art+' ':'')+pp.n,
             d:(pp.mn?pp.mn+' \u00B7 ':'')+nfm(pp.v)+' verses', place:pp.id});
         }
       }
       // journeys
       if(JRN) for(var jj=0;jj<JRN.length;jj++){
         if(JRN[jj].n.toLowerCase().indexOf(ql)>=0 || JRN[jj].s.toLowerCase().indexOf(ql)>=0)
-          palItems.push({k:'Journey',n:JRN[jj].n,d:JRN[jj].w.length+' stops',journey:jj});
+          base.push({k:'Journey',n:JRN[jj].n,d:JRN[jj].w.length+' stops',journey:jj});
       }
     } else {
-      palItems=[
+      base=[
         {k:'View',n:'The reader',d:'66 books',view:'read'},
         {k:'View',n:'The web of cross-references',d:'133,679 links',view:'web'},
         {k:'View',n:'The atlas',d:'maps and journeys',view:'atlas'},
         {k:'View',n:'Every place in scripture',d:'1,335 places',view:'places'}
       ];
     }
-    palItems=palItems.slice(0,24);
+    palBase=base; palVerse=[]; palNote='';
+    // words: async and debounced, never in the way of the reference/place matches above
+    clearTimeout(palTimer); var seq=++palSeq;
+    if(!passage && q.replace(/["\u201c\u201d]/g,'').trim().length>=3){
+      palNote='Searching the '+trShort()+' text\u2026';
+      palTimer=setTimeout(function(){
+        vsearch(q).then(function(r){
+          if(seq!==palSeq) return;
+          palVerse=r.items; palNote=r.note; palDraw();
+        }).catch(function(){ if(seq===palSeq){ palNote='Word search is unavailable right now.'; palDraw(); } });
+      },150);
+    }
+    palDraw();
+  }
+  function palDraw(){
+    var nb=Math.min(palBase.length, palNote ? 8 : 24);
+    palItems=palBase.slice(0,nb).concat(palVerse);
     if(palSel>=palItems.length) palSel=0;
     var out='';
     for(var k=0;k<palItems.length;k++){
       var it=palItems[k];
+      if(k===nb) out+='<div class="pal-sec">'+esc(palNote)+'</div>';
+      if(it.t!==undefined){
+        out+='<button class="pr pv'+(k===palSel?' sel':'')+'" data-i="'+k+'">'
+          +'<span class="pr-n">'+esc(it.n)+'</span><span class="pr-t">'+it.t+'</span></button>';
+        continue;
+      }
       out+='<button class="pr'+(k===palSel?' sel':'')+'" data-i="'+k+'">'
         +'<span class="pr-k">'+it.k+'</span><span class="pr-n">'+esc(it.n)+'</span>'
         +'<span class="pr-d">'+esc(it.d||'')+'</span></button>';
     }
+    if(palNote && !palVerse.length) out+='<div class="pal-sec">'+esc(palNote)+'</div>';
     $('palres').innerHTML = out || '<div class="empty">Nothing matches that.</div>';
+    var sel=$('palres').querySelector('.pr.sel'); if(sel && sel.scrollIntoView) sel.scrollIntoView({block:'nearest'});
+  }
+
+  /* ================= full-text search =================
+     build/search.py writes one inverted index per translation, sharded by the first two
+     characters of each token: data/s/<trans>/<xx>.json maps token -> delta-encoded base-36
+     verse indices. A query loads only the shards its terms need. Tokenising here must match
+     search.py exactly (NFKD, strip marks, lowercase, [a-z0-9]+, length >= 2); the stoplist
+     comes from data/s/meta.json so the two cannot drift. */
+  var SMETA=null, SSH={}, VTOTAL=31102;
+  function trShort(){ for(var i=0;i<TRS.length;i++) if(TRS[i].id===TR) return TRS[i].short; return TR.toUpperCase() }
+  // min 2 = the index's rule; phrases are checked against the text with min 1, so that
+  // "I am" does not collapse to "am" and match "Am I"
+  function stoks(t,min){
+    min=min||2;
+    t=String(t); if(t.normalize) t=t.normalize('NFKD').replace(/[\u0300-\u036f]/g,'');
+    var m=t.toLowerCase().match(/[a-z0-9]+/g)||[], out=[];
+    for(var i=0;i<m.length;i++) if(m[i].length>=min) out.push(m[i]);
+    return out;
+  }
+  function smeta(){
+    if(SMETA) return Promise.resolve(SMETA);
+    return jget('data/s/meta.json').then(function(j){
+      j.stopSet={}; for(var i=0;i<j.stop.length;i++) j.stopSet[j.stop[i]]=1;
+      j.has={}; for(var t in j.shards){ j.has[t]={}; for(var k=0;k<j.shards[t].length;k++) j.has[t][j.shards[t][k]]=1; }
+      SMETA=j; return j;
+    });
+  }
+  function shard(tr,key){
+    var id=tr+'/'+key;
+    if(SSH[id]) return SSH[id];
+    // only ask for shards that exist: a 404 is a console error and a wasted round trip
+    SSH[id] = SMETA.has[tr] && SMETA.has[tr][key] ? jget('data/s/'+id+'.json') : Promise.resolve({});
+    SSH[id].catch(function(){ delete SSH[id] });
+    return SSH[id];
+  }
+  function decode(s){
+    var p=s.split('.'), out=new Array(p.length), g=0;
+    for(var i=0;i<p.length;i++){ g+=parseInt(p[i],36); out[i]=g; }
+    return out;
+  }
+  function loadText(bi){
+    var k=TR+'_'+bi;
+    return TC[k] ? Promise.resolve(TC[k]) : jget('data/'+TR+'/'+bi+'.json').then(function(j){TC[k]=j;return j});
+  }
+  function verseText(g){
+    var l=locate(g), t=TC[TR+'_'+l.b];
+    return t && t[l.c-1] ? t[l.c-1][l.v-1] : '';
+  }
+  // parse: "quoted phrases" are exact and consecutive; loose words match as prefixes once
+  // they are three characters long, so results arrive while the reader is still typing
+  function sparse(q){
+    var terms=[], phrases=[], raw=[], stop=SMETA.stopSet, re=/["\u201c\u201d]([^"\u201c\u201d]*)["\u201c\u201d]?/g, m, loose=q;
+    while((m=re.exec(q))){ var w=stoks(m[1],1); if(w.length){ phrases.push(w); raw.push(m[1].trim().replace(/\s+/g,' ')); } }
+    loose=q.replace(re,' ');
+    var lw=stoks(loose);
+    for(var i=0;i<lw.length;i++) if(!stop[lw[i]]) terms.push({w:lw[i], pre:lw[i].length>=3});
+    for(var p=0;p<phrases.length;p++) for(var j=0;j<phrases[p].length;j++)
+      if(phrases[p][j].length>=2 && !stop[phrases[p][j]]) terms.push({w:phrases[p][j], pre:false});
+    return {terms:terms, phrases:phrases, raw:raw};
+  }
+  function vsearch(q){
+    var tr=TR;
+    return smeta().then(function(){
+      var P=sparse(q);
+      if(!P.terms.length) return {items:[], note: P.phrases.length||stoks(q).length
+        ? 'Those words are too common to search on their own. Add a less common word.' : ''};
+      return Promise.all(P.terms.map(function(t){ return shard(tr,t.w.slice(0,2)) })).then(function(sh){
+        // per term: verse -> best score; a verse must match every term
+        var acc=null;
+        for(var i=0;i<P.terms.length;i++){
+          var t=P.terms[i], s=sh[i], hit={};
+          for(var tok in s){
+            if(tok!==t.w && !(t.pre && tok.indexOf(t.w)===0)) continue;
+            var post=decode(s[tok]);
+            // rarity: inverse document frequency; an exact word outranks a longer word it prefixes
+            var sc=Math.log(VTOTAL/post.length) + (tok===t.w ? 100 : 0);
+            for(var k=0;k<post.length;k++) if(!(hit[post[k]]>=sc)) hit[post[k]]=sc;
+          }
+          if(acc===null) acc=hit;
+          else { var nx={}; for(var g in acc) if(hit[g]!==undefined) nx[g]=acc[g]+hit[g]; acc=nx; }
+        }
+        var ranked=[];
+        for(var g2 in acc) ranked.push([+g2, acc[g2]]);
+        ranked.sort(function(a,b){ return b[1]-a[1] || a[0]-b[0] });
+        return vconfirm(ranked, P, tr);
+      });
+    });
+  }
+  // load the text for the best-ranked candidates, check phrases against it, keep 20
+  function vconfirm(ranked, P, tr){
+    var keep=[], at=0, WANT=20;
+    function step(){
+      if(tr!==TR) return Promise.reject(new Error('translation changed'));
+      if(keep.length>=WANT || at>=ranked.length) return done();
+      var batch=ranked.slice(at, at+(P.phrases.length?60:WANT-keep.length)); at+=batch.length;
+      var books={};
+      for(var i=0;i<batch.length;i++) books[locate(batch[i][0]).b]=1;
+      return Promise.all(Object.keys(books).map(function(b){ return loadText(+b) })).then(function(){
+        for(var j=0;j<batch.length && keep.length<WANT;j++){
+          var txt=verseText(batch[j][0]);
+          if(P.phrases.length && !hasPhrases(stoks(txt,1), P.phrases)) continue;
+          keep.push(batch[j][0]);
+        }
+        return step();
+      });
+    }
+    function done(){
+      var items=[];
+      for(var i=0;i<keep.length;i++){
+        var l=locate(keep[i]);
+        items.push({k:'Verse', n:label(l), t:snippet(verseText(keep[i]), P), go:{b:l.b,c:l.c,v:l.v}});
+      }
+      var lead=P.raw.length ? '\u201c'+P.raw.join('\u201d, \u201c')+'\u201d' : '';
+      var note = !items.length ? 'No verse in the '+trShort()+' contains '+(lead||'those words')+'.'
+        : P.phrases.length ? (keep.length<WANT ? nfm(keep.length)+(keep.length===1?' verse':' verses') : 'Verses')+' containing '+lead+' \u00B7 '+trShort()
+        : nfm(ranked.length)+(ranked.length===1?' verse':' verses')+' \u00B7 '+trShort()+' \u00B7 rarest words first'
+          +(ranked.length>WANT?' \u00B7 top '+WANT:'');
+      return {items:items, note:note};
+    }
+    return step();
+  }
+  function hasPhrases(toks, phrases){
+    for(var p=0;p<phrases.length;p++) if(phraseAt(toks, phrases[p])<0) return false;
+    return true;
+  }
+  function phraseAt(toks, ph){
+    outer: for(var i=0;i+ph.length<=toks.length;i++){
+      for(var j=0;j<ph.length;j++) if(toks[i+j]!==ph[j]) continue outer;
+      return i;
+    }
+    return -1;
+  }
+  // mark the matched words in the verse's own text, then trim long verses around the first mark
+  function snippet(txt, P){
+    var words=[], re=/[A-Za-z0-9\u00C0-\u024F]+/g, m;
+    while((m=re.exec(txt))){ var tk=stoks(m[0],1); words.push({a:m.index, z:m.index+m[0].length, t:tk.length?tk[0]:''}); }
+    var on={}, toks=words.map(function(w){return w.t});
+    for(var i=0;i<words.length;i++) for(var j=0;j<P.terms.length;j++){
+      var t=P.terms[j], w=words[i].t;
+      if(w && (w===t.w || (t.pre && w.indexOf(t.w)===0))) on[i]=1;
+    }
+    for(var p=0;p<P.phrases.length;p++){
+      var at=phraseAt(toks, P.phrases[p]);
+      if(at>=0) for(var r=at;r<at+P.phrases[p].length;r++) on[r]=1;
+    }
+    var first=-1; for(var f=0;f<words.length;f++) if(on[f]){ first=words[f].a; break; }
+    var from=0, to=txt.length, MAX=170;
+    if(txt.length>MAX){
+      from=Math.max(0, first-60);
+      if(from>0){ var sp=txt.lastIndexOf(' ', from); from = sp>0 ? sp+1 : 0; }
+      to=Math.min(txt.length, from+MAX);
+      if(to<txt.length){ var sp2=txt.lastIndexOf(' ', to); if(sp2>from) to=sp2; }
+    }
+    var out=from>0?'\u2026':'', last=from;
+    for(var n=0;n<words.length;n++){
+      if(!on[n] || words[n].a<from || words[n].z>to) continue;
+      out+=esc(txt.slice(last, words[n].a))+'<mark>'+esc(txt.slice(words[n].a, words[n].z))+'</mark>';
+      last=words[n].z;
+    }
+    return out+esc(txt.slice(last, to))+(to<txt.length?'\u2026':'');
   }
   function palGo(i){
     var it=palItems[i]; if(!it) return;
@@ -1757,8 +1951,8 @@ body.dens .v.lk{background:linear-gradient(var(--dz),var(--dz))}
   });
   $('palscrim').addEventListener('mousedown',function(e){ if(e.target===this) closePal() });
   $('palq').addEventListener('keydown',function(e){
-    if(e.key==='ArrowDown'){ e.preventDefault(); palSel=Math.min(palSel+1,palItems.length-1); palRender(this.value); }
-    else if(e.key==='ArrowUp'){ e.preventDefault(); palSel=Math.max(palSel-1,0); palRender(this.value); }
+    if(e.key==='ArrowDown'){ e.preventDefault(); palSel=Math.min(palSel+1,palItems.length-1); palDraw(); }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); palSel=Math.max(palSel-1,0); palDraw(); }
     else if(e.key==='Enter'){ e.preventDefault(); palGo(palSel); }
     else if(e.key==='Escape'){ closePal(); }
   });

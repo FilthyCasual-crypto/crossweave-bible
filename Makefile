@@ -45,6 +45,7 @@ data: ## full data rebuild, in dependency order (needs sources/ matching the bas
 	$(PY) build/spans.py
 	$(PY) build/kingdoms.py
 	$(PY) build/journeys.py
+	$(PY) build/search.py
 	@$(MAKE) --no-print-directory verify
 
 clean: ## remove screenshots and caches
