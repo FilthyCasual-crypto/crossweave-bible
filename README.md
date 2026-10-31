@@ -19,6 +19,13 @@ what makes "free" structurally true rather than aspirational.
 
 ---
 
+## Use it
+
+- **Online:** <https://filthycasual-crypto.github.io/crossweave-bible/> - nothing to install, works on phones.
+- **Offline download:** grab the latest `crossweave-vX.Y.Z.zip` from
+  [Releases](https://github.com/FilthyCasual-crypto/crossweave-bible/releases/latest), unzip it, then
+  double-click `start.bat` (Windows) or run `sh start.sh` (macOS/Linux). Needs Python 3.
+
 ## Running it
 
 The app is plain HTML plus JSON. Any static server works:
