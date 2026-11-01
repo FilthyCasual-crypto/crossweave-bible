@@ -93,6 +93,21 @@ async function page(opts = {}) {
   assert(await p.isVisible('#bub'), 'reader: clicking a place did not open the bubble');
   assert(await p.isVisible('#bgo'), 'reader: the place bubble has no Open map control');
   if (SHOTS) await p.screenshot({ path: '.shots/read.png' });
+
+  // translation menu: one entry per translation in index.json, and choosing one re-renders
+  await p.click('#trbtn');
+  await p.waitForTimeout(200);
+  const items = await p.$$('#trmenu button');
+  assert(items.length === T.translations,
+         `reader: translation menu lists ${items.length}, expected ${T.translations}`);
+  if (SHOTS) await p.screenshot({ path: '.shots/translations.png' });
+  const before = await p.textContent('.v');
+  await p.click('#trmenu button[data-tr="ylt"]');
+  await p.waitForTimeout(1200);
+  assert(await p.isHidden('#trmenu'), 'reader: translation menu stayed open after a choice');
+  assert((await p.textContent('#trbtn')).trim() === 'YLT', 'reader: pill does not show YLT after choosing it');
+  assert((await p.textContent('.v')) !== before, 'reader: verse text did not change with the translation');
+  assert((await p.$$('.v')).length > 0, 'reader: no verses after switching translation');
   await p.close();
 }
 

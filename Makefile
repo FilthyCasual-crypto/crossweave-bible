@@ -25,7 +25,7 @@ dev-deps: ## install the only dev dependency (Playwright, pinned by package-lock
 	npm ci && npx playwright install chromium
 #  to move the pin deliberately: npm i -D --save-exact playwright@<version>, commit both files
 
-sources: ## fetch the five upstream datasets into sources/ and check them against the baseline
+sources: ## fetch the upstream datasets into sources/ and check them against the baseline
 	@mkdir -p sources
 	@cd sources && \
 	  curl -sSLO https://a.openbible.info/data/cross-references.zip && unzip -oq cross-references.zip && \
@@ -33,6 +33,9 @@ sources: ## fetch the five upstream datasets into sources/ and check them agains
 	  curl -sSL -o bsb_bsb.txt https://bereanbible.com/bsb.txt && \
 	  for f in ancient modern geometry; do \
 	    curl -sSL -o $$f.jsonl https://raw.githubusercontent.com/openbibleinfo/Bible-Geocoding-Data/main/data/$$f.jsonl; \
+	  done && \
+	  for t in ASV YLT Darby Webster BBE; do \
+	    curl -sSL -o $$t.json https://raw.githubusercontent.com/scrollmapper/bible_databases/59b18c5af5845728c275d5b7178ad0d024172b1f/formats/json/$$t.json; \
 	  done && \
 	  curl -sSL -o ne_countries.geojson https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_0_countries.geojson
 	@$(PY) scripts/check_sources.py

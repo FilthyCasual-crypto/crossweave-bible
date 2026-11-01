@@ -21,6 +21,12 @@ curl -L -o kjv.json \
 # Berean Standard Bible text (public domain) - 4.3 MB
 curl -L -o bsb_bsb.txt https://bereanbible.com/bsb.txt
 
+# ASV, YLT, Darby, Webster, BBE (public domain) - 8.4 MB each, pinned to one commit
+for t in ASV YLT Darby Webster BBE; do
+  curl -L -o $t.json \
+    https://raw.githubusercontent.com/scrollmapper/bible_databases/59b18c5af5845728c275d5b7178ad0d024172b1f/formats/json/$t.json
+done
+
 # gazetteer (openBible, CC BY) - 15 MB
 for f in ancient modern geometry; do
   curl -L -o $f.jsonl \

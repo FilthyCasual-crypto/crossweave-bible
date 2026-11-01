@@ -10,7 +10,7 @@
     "places": 1335,
     "journeys": 7,
     "kingdoms": 13,
-    "translations": 2
+    "translations": 7
   },
   "sources": {
     "cross_references.txt": "203e2bc2ae11de5c9745c86504fe3e32c841ac8a59a6453dc68d34614f69769a",
@@ -19,6 +19,11 @@
     "ancient.jsonl": "b8187aa4737e8517ccc090f765d2be11da4c548cd2a59d3cdcb62e952cb8c0f2",
     "modern.jsonl": "da731f6e110bac4ea66a9f037a0a31cfb11c4f1efc1206aa9e109092b2c60087",
     "geometry.jsonl": "e44b10ae46f92eb43a5fca2edf012f8fe19090e1c8488d7dfe1bf47ca222f3b7",
-    "ne_countries.geojson": "3e458fc036ad0a66411f2c1e6cac49c5d7bfb81cb1123bc513b22511a2b7fdeb"
+    "ne_countries.geojson": "3e458fc036ad0a66411f2c1e6cac49c5d7bfb81cb1123bc513b22511a2b7fdeb",
+    "ASV.json": "602445e22c280a682ac4c489117ead179271f5ee50a78ee4531b249c71e7ce99",
+    "YLT.json": "d55ef42dae715c4fc5d00049011b818a42a99e0ff419f5f08bc37cea0b4f12e3",
+    "Darby.json": "5f3c9dd04a4d92084a8f506baf62972f9a6c45aa0ea390e3bcdaea71e3aeb294",
+    "Webster.json": "21d32fca7a463385a5049aca0894318fd60396211be72fd8e8ee9ed76bd6355e",
+    "BBE.json": "2396c027cfd1c47c9bb325c5c1ed1b1c125b95ef4c5382ddba4f8e50651f8068"
   }
 }

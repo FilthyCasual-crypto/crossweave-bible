@@ -18,6 +18,18 @@ others) are present in the BSB files as a bracketed note rather than omitted, so
 numbering stays aligned between translations and cross-references pointing at them still
 resolve.
 
+**American Standard Version (1901), Young's Literal Translation (1898), Darby Translation
+(1890), Webster Bible (1833)** — public domain (published before 1929).
+
+**Bible in Basic English (1965)** — public domain in the United States: it was published
+without a copyright notice. Its status may differ elsewhere.
+
+These five are taken from the JSON files in
+[scrollmapper/bible_databases](https://github.com/scrollmapper/bible_databases), pinned to
+commit `59b18c5`, and each checked against the KJV versification at build time. Where the ASV,
+Darby or BBE leave out a verse the KJV has, the verse carries the same bracketed note as the
+BSB.
+
 ### On the NASB
 
 The New American Standard Bible is **not** included and cannot be without a licence. The

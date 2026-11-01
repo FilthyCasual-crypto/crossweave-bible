@@ -46,6 +46,32 @@ TRANS = [
   {'id':'kjv','name':'King James Version','short':'KJV','note':'Public domain','data':KJV},
 ]
 
+# ---------- further public-domain translations (scrollmapper/bible_databases JSON) ----------
+# Each must share the KJV versification exactly; verses a translation leaves out (the critical-
+# text omissions) get the same bracketed note as the BSB so numbering stays aligned.
+def scrollmapper(fname):
+    books = json.load(open(f'{DATA}/{fname}', encoding='utf-8'))['books']
+    assert len(books) == 66, (fname, len(books))
+    out = []
+    for bi, b in enumerate(books):
+        assert len(b['chapters']) == len(KJV[bi]), (fname, b['name'])
+        bk = []
+        for ci, c in enumerate(b['chapters']):
+            vs = c['verses']
+            assert [v['verse'] for v in vs] == list(range(1, len(KJV[bi][ci]) + 1)), (fname, b['name'], ci + 1)
+            bk.append([re.sub(r'\s+', ' ', v['text']).strip() or OMIT for v in vs])
+        out.append(bk)
+    return out
+
+for tid, fname, name, short, note in [
+    ('asv',   'ASV.json',     'American Standard Version (1901)',  'ASV',   'Public domain'),
+    ('ylt',   'YLT.json',     "Young's Literal Translation (1898)", 'YLT',   'Public domain'),
+    ('darby', 'Darby.json',   'Darby Translation (1890)',           'DARBY', 'Public domain'),
+    ('wbt','Webster.json','Webster Bible (1833)',               'WBT',   'Public domain'),
+    ('bbe',   'BBE.json',     'Bible in Basic English (1965)',      'BBE',   'Public domain in the United States'),
+]:
+    TRANS.append({'id':tid,'name':name,'short':short,'note':note,'data':scrollmapper(fname)})
+
 # ---------- index ----------
 idx = {}; books = []; g = 0
 for bi in range(66):

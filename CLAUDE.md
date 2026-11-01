@@ -1,7 +1,7 @@
 # Crossweave — working notes for Claude Code
 
 A static, hyperlinked Bible reader. No backend, no build step for the app itself, no runtime
-dependencies. `app/index.html` is the entire application; `app/data/` is 18 MB of generated
+dependencies. `app/index.html` is the entire application; `app/data/` is 51 MB of generated
 JSON; `build/` regenerates that JSON from public datasets.
 
 Read `README.md` for what the product is. This file is about how to work on it safely.
@@ -15,14 +15,14 @@ make serve     # static server on :8000 (the app CANNOT run from file://)
 make verify    # data integrity + the ASCII rule - run before every commit
 make check     # render all five views headless, fail on any console/page error
 make shots     # write screenshots of every view to .shots/ for eyeballing
-make sources   # fetch the five upstream datasets into sources/, fail if they drifted
+make sources   # fetch the upstream datasets into sources/, fail if they drifted
 make data      # full data rebuild, in dependency order (refuses to run on drifted sources)
 ```
 
 `make verify` is cheap and catches the mistakes that have actually shipped. Run it. It is the
 same thing as `python3 scripts/verify.py` — use whichever.
 
-`make check` runs 45 assertions across all five views and fails on any console or page
+`make check` runs 50 assertions across all five views and fails on any console or page
 error. Two env overrides: `CW_CHROMIUM=/path/to/chromium` to use a browser Playwright did
 not install, `CW_BASE=https://host/index.html` to check a deployed build instead of
 localhost.

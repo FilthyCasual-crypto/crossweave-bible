@@ -12,8 +12,8 @@ cross-references.
 | Chapter-to-chapter links | 133,679, of which 29.6% cross between the Testaments |
 | Places mapped | 1,335, with modern site names and coordinates |
 | Journey routes | 7, each stop keyed to the verse that names it |
-| Translations | Berean Standard Bible, King James Version |
-| Search | Every word of both translations, phrases in quotes, ranked rarest first |
+| Translations | 7, all public domain: BSB, KJV, ASV, Young's Literal, Darby, Webster, Bible in Basic English |
+| Search | Every word of every translation, phrases in quotes, ranked rarest first |
 
 Everything is static. No backend, no accounts, no database, nothing to pay for — which is
 what makes "free" structurally true rather than aspirational.
@@ -59,6 +59,8 @@ app/
     index.json          book names, chapter lengths, verse offsets, translation list
     bsb/<0-65>.json     Berean Standard Bible, one file per book
     kjv/<0-65>.json     King James Version, one file per book
+    asv/ ylt/ darby/    American Standard, Young's Literal, Darby,
+    wbt/ bbe/           Webster, Bible in Basic English - same layout
     x/<0-65>.json       cross-reference graph, keyed by verse offset within the book
     arcs.json           chapter-level aggregate for the whole-canon arc view
     geo/
@@ -67,19 +69,19 @@ app/
       kingdoms.json     13 approximate kingdom extents (see the warning below)
       journeys.json     7 routes, each stop carrying its verse reference
       bsb-<0-65>.json   character offsets of every place name in the BSB text
-      kjv-<0-65>.json   the same for the KJV
+      kjv-<0-65>.json   the same for the KJV (and one set per further translation)
     s/
       meta.json         stoplist and shard list for full-text search
       bsb/<xx>.json     inverted index, one shard per two-letter token prefix
-      kjv/<xx>.json     the same for the KJV
+      kjv/<xx>.json     the same for the KJV (and one directory per further translation)
 build/
-  build.py              verse text + cross-reference graph -> data/index.json, bsb/, kjv/, x/
+  build.py              verse text + cross-reference graph -> data/index.json, one dir per translation, x/
   arcs.py               verse-level graph -> chapter-level arcs.json
   geo.py                gazetteer + Natural Earth -> geo/base.json, geo/places.json
   spans.py              place-name matching -> geo/<trans>-<book>.json
   kingdoms.py           the hand-drawn approximate kingdom extents
   journeys.py           curated itineraries -> geo/journeys.json
-  search.py             verse text -> s/ (full-text index, both translations)
+  search.py             verse text -> s/ (full-text index, every translation)
 ```
 
 ### Design decisions worth knowing before you change anything
@@ -91,13 +93,14 @@ table on the client turns any integer back into "John 3:16".
 
 **Text and references are separate layers.** `data/x/` is translation-independent. Adding a
 translation is: drop 66 JSON files into `data/<id>/`, add one entry to the `trans` array in
-`index.json`. The graph is untouched. This is how KJV was added after BSB, and how NASB
-would be added if it were ever licensed.
+`index.json`. The graph is untouched. This is how KJV was added after BSB, then ASV,
+YLT, Darby, Webster and BBE, and how NASB would be added if it were ever licensed.
 
 **Place names are matched at build time, not guessed at runtime.** `spans.py` asks the
 gazetteer which places each verse mentions, finds the longest matching surface form in the
 actual text, and records character offsets. The renderer only wraps spans it was handed.
-Match rate: 89.2% BSB, 94.4% KJV. The gap is places referred to by pronoun, which correctly
+Match rate: 89.2% BSB, 94.4% KJV, 75-83% for the other five (YLT lowest: its
+spellings, such as "Beth-El", differ most from the gazetteer's). The gap is places referred to by pronoun, which correctly
 produce no link rather than a wrong one.
 
 **Everything is drawn on canvas.** 133,679 arcs and a full vector map are far past what the

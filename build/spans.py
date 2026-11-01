@@ -50,7 +50,8 @@ def spans_for(text, pids):
     out.sort(key=lambda s:s[0])
     return out
 
-for tr in ('bsb','kjv'):
+TRS=[t['id'] for t in json.load(open(f'{OUT}/data/index.json'))['trans']]
+for tr in TRS:
     tot=0; hit=0; miss=collections.Counter()
     for bi in range(66):
         T=json.load(open(f'{OUT}/data/{tr}/{bi}.json'))
@@ -60,7 +61,7 @@ for tr in ('bsb','kjv'):
                 key=f'{bi}.{ci+1}.{vi+1}'
                 lst=MEN.get(key)
                 if not lst: continue
-                pids=[x[0] for x in lst] if tr=='bsb' else [x[0] for x in lst if x[1]]
+                pids=[x[0] for x in lst] if tr!='kjv' else [x[0] for x in lst if x[1]]
                 if not pids: continue
                 tot+=len(pids)
                 sp=spans_for(txt, pids)
@@ -72,5 +73,5 @@ for tr in ('bsb','kjv'):
         json.dump(res, open(f'{OUT}/data/geo/{tr}-{bi}.json','w'), separators=(',',':'))
     print(f'{tr}: matched {hit}/{tot} = {100*hit/max(tot,1):.1f}%  top misses:', miss.most_common(8))
 
-sz=sum(os.path.getsize(f'{OUT}/data/geo/{t}-{b}.json') for t in ('bsb','kjv') for b in range(66))
+sz=sum(os.path.getsize(f'{OUT}/data/geo/{t}-{b}.json') for t in TRS for b in range(66))
 print('span files total', round(sz/1e6,2),'MB')
